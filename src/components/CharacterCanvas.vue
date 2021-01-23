@@ -15,6 +15,8 @@
           @new-pick="pickNewItem($event)"
           @disable-item="disableItem($event)"
           @change-color="changeColor($event)"
+          @randomize-character="randomize()"
+          @reset-character="reset()"
           :type="active" 
           :maxRange="selections[active].max" 
           :key="`${active}editor`" 
@@ -60,7 +62,7 @@ export default {
             which: 0,
             top: 0,
             left: 0,
-            max: 3,
+            max: 5,
             disable: false,
             color: null
           },
@@ -68,7 +70,15 @@ export default {
             which: 0,
             top: 0,
             left: 0,
-            max:11,
+            max:16,
+            disable: false,
+            color: null
+          },
+          brows: {
+            which: 0,
+            top: 0,
+            left: 0,
+            max:7,
             disable: false,
             color: null
           },
@@ -76,7 +86,7 @@ export default {
             which: 0,
             top: 0,
             left: 0,
-            max: 4,
+            max: 7,
             disable: false,
             color: null
           },
@@ -84,13 +94,21 @@ export default {
             which: 0,
             top: 0,
             left: 0,
-            max: 4,
+            max: 6,
             disable: false,
             color: null
           },
           beard: {
             which: 0,
             top: 0,
+            left: 0,
+            max: 3,
+            disable: false,
+            color: null
+          },
+          ears: {
+            which: 0,
+            top: 2,
             left: 0,
             max: 1,
             disable: false,
@@ -100,7 +118,7 @@ export default {
             which: 0,
             top: 2,
             left: 0,
-            max: 6,
+            max: 8,
             disable: false,
             color: null
           },
@@ -108,12 +126,22 @@ export default {
             which: 0,
             top: 2,
             left: 0,
-            max: 5,
+            max: 6,
             disable: false,
             color: null
           },
       },
-      base: null,
+      options: {
+        body: null,
+        extras: null,
+        eyes: null,
+        mouth: null,
+        nose: null,
+        beard: null,
+        ears: null,
+        hair: null,
+        clothes: null,
+      },
       defaultColor:'rgba(255,255,255,0.1)',
       colors: {
         none: null,
@@ -128,6 +156,7 @@ export default {
         blue: 'rgba(1, 94, 201, 0.3)',
         orange: 'rgba(255, 105, 18, 0.3)'
       },
+      colorList:['none','red', 'yellow', 'brown', 'peach', 'black', 'darkbrown', 'purple', 'green', 'blue', 'orange']
     }
   },
   computed: {
@@ -149,14 +178,16 @@ export default {
       this.active = e;
     },
     init(){
-      let spriteHeight = 0;
       this.ctx.clearRect(0,0,500,500)
 
-      for(let selection in this.selections){
+      let optionsLoop = ['body', 'extras', 'eyes', 'brows', 'mouth', 'nose', 'beard', 'ears', 'hair', 'clothes'];
 
+      let i = 0;
+
+      for(let selection in this.selections){
         if(this.selections[selection].disable === false) {
           this.stagectx.globalCompositeOperation = "source-over";
-          this.stagectx.drawImage(this.base, this.selections[selection].which*500, spriteHeight, 500, 500, this.selections[selection].top, this.selections[selection].left, 500, 500);
+          this.stagectx.drawImage(this.options[optionsLoop[i]], this.selections[selection].which*500, 0, 500, 500, this.selections[selection].top, this.selections[selection].left, 500, 500);
           
           if (this.selections[selection].color !== null) {
             this.stagectx.fillStyle = this.selections[selection].color;
@@ -168,7 +199,7 @@ export default {
           this.ctx.drawImage(this.stageCanvas, 0, 0, 500, 500, 0, 0, 500, 500);
           this.stagectx.clearRect(0,0,500,500)
         }
-        spriteHeight += 500;
+        i++
       }
     },
     moveSprite(e) {
@@ -178,6 +209,21 @@ export default {
 
       if(e.direction === 'x') {
         this.selections[this.active].top += e.value;
+      }
+
+      if(e.direction === 'xy-neg') {
+        this.selections[this.active].left += e.value;
+        this.selections[this.active].top += e.value
+      }
+
+      if(e.direction === 'xy-pos') {
+        this.selections[this.active].left += e.value;
+        this.selections[this.active].top -= e.value
+      }
+
+      if(e.direction === 'reset') {
+        this.selections[this.active].left = 0;
+        this.selections[this.active].top = 0;
       }
         this.init();
     },
@@ -196,20 +242,74 @@ export default {
       this.selections[this.active].color = this.colors[e];
       this.init();
     },
+    randomize() {
+      for(let selection in this.selections){
+        let randomPick = Math.floor(Math.random() * this.selections[selection].max);
+        this.selections[selection].which = randomPick;
+        let randomColor = Math.floor(Math.random() * this.colorList.length-1);
+        this.selections[selection].color = this.colors[this.colorList[randomColor]];
+        this.init()
+      }
+    },
+    reset() {
+      for(let selection in this.selections){
+        let randomPick = Math.floor(Math.random() * this.selections[selection].max);
+        this.selections[selection].left = 0;
+        this.selections[selection].top = 0;
+        this.selections[selection].which = randomPick;
+        this.selections[selection].color = null;
+        this.init();
+    }
+    }
   },
   mounted(){
 
-    let bases = new Image();
-    bases.src = require("@/assets/imgs/spritesheet.png");
+    let bodys = new Image();
+    bodys.src = require("@/assets/imgs/bodys.png");
+    this.options.body = bodys;
+    
+    let extras = new Image();
+    extras.src = require("@/assets/imgs/extras.png");
+    this.options.extras = extras;
+    
+    let eyes = new Image();
+    eyes.src = require("@/assets/imgs/eyes.png");
+    this.options.eyes = eyes;
+    
+    let brows = new Image();
+    brows.src = require("@/assets/imgs/brows.png");
+    this.options.brows = brows;
 
-    this.base = bases;
+    let mouth = new Image();
+    mouth.src = require("@/assets/imgs/mouth.png");
+    this.options.mouth = mouth;
+
+    let nose = new Image();
+    nose.src = require("@/assets/imgs/nose.png");
+    this.options.nose = nose;
+
+    let beard = new Image();
+    beard.src = require("@/assets/imgs/beard.png");
+    this.options.beard = beard;
+
+    let ears = new Image();
+    ears.src = require("@/assets/imgs/ears.png");
+    this.options.ears = ears;
+
+    let hair = new Image();
+    hair.src = require("@/assets/imgs/hair.png");
+    this.options.hair = hair;
+
+    let clothes = new Image();
+    clothes.src = require("@/assets/imgs/clothes.png");
+    this.options.clothes = clothes;
 
     for(let selection in this.selections){
       let randomPick = Math.floor(Math.random() * this.selections[selection].max);
       this.selections[selection].which = randomPick;
     }
 
-    bases.onload = () => {
+    clothes.onload = () => {
       this.init();
     };
 
@@ -255,6 +355,7 @@ export default {
   
   .flexRow {
     display:flex;
+    margin:5px 0;
   }
 
   .fade-enter-active, .fade-leave-active {

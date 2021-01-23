@@ -29,7 +29,6 @@
         </div>
 
         <div class="flexRow section">
-            <p>Reposition:</p>
             <div class="flexColumn">
                 <div class="flexRow">
                     <div class="border margin arrow" @click="reposition(-1, 'xy-neg')">
@@ -108,20 +107,29 @@
                 </div>
             </div>
            
-            <!-- <div class="line"></div> -->
+            <div class="line"></div>
 
-            <!-- <div class="flexColumn">
-                <div class="border flexRow rotate arrow">
+            <div class="flexColumn">
+                <div class="border flexRowCenter rotate arrow" @click="$emit('rotate-canvas')">
                     <p>Rotate 15</p>
                     <font-awesome-icon class="fa-rotate-n45" :icon="['fas', 'sync']" />
                 </div>
-                <div class="border flexRow rotate arrow">
-                    <p>Rotate 45</p>
+                <div class="border flexRowCenter rotate arrow" @click="$emit('reset-rotation')">
+                    <p>Reset Rotation</p>
                     <font-awesome-icon class="fa-rotate-n45" :icon="['fas', 'sync']" />
                 </div>
-                <div class="border flexRow rotate arrow">
-                    <p>Rotate 90</p>
-                    <font-awesome-icon class="fa-rotate-n45" :icon="['fas', 'sync']" />
+            </div>
+
+            <!-- <div class="line"></div>
+
+            <div class="flexColumn">
+                <div class="border flexRowCenter rotate arrow">
+                    <p>Scale Up</p>
+                    <font-awesome-icon :icon="['fas', 'arrow-up']" />
+                </div>
+                <div class="border flexRowCenter rotate arrow">
+                    <p>Scale Down</p>
+                    <font-awesome-icon :icon="['fas', 'arrow-down']" />
                 </div>
             </div> -->
         </div>
@@ -193,6 +201,7 @@
 
     .rotate p {
         font-size:10px;
+        margin:0 10px 0 0;
     }
 
     p {
@@ -208,6 +217,13 @@
         display:flex;
         flex-direction: row;
         align-items:center;
+    }
+ 
+    .flexRowCenter {
+        display:flex;
+        flex-direction: row;
+        align-items:center;
+        justify-content:center;
     }
 
     .section {

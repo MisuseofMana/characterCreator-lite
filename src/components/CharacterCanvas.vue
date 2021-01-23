@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="flexRow">
 
   <div class="flexColumn">
     <div class="flexRowFit">
@@ -17,6 +17,8 @@
           @change-color="changeColor($event)"
           @randomize-character="randomize()"
           @reset-character="reset()"
+          @rotate-canvas="rotateCanvas()"
+          @reset-rotation="resetRotation()"
           :type="active" 
           :maxRange="selections[active].max" 
           :key="`${active}editor`" 
@@ -24,13 +26,12 @@
         />
       </transition>
     </div>
-    <div class="flexRowFit">
-      <p>Right click character and click save as to download. Have fun!</p>
-    </div>
   </div>
   
-
-  <canvas id="canvas" width="500" height="500"></canvas>
+  <div class="flexColumn">
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <p>Right click character and click save image as to download. Have fun!</p>
+  </div>
 
   <canvas id="stageCanvas" class="hidden" width="500" height="500"></canvas>
 
@@ -54,6 +55,7 @@ export default {
             which: 0,
             top: 0,
             left: 0,
+            rotation: 0,
             max: 5,
             disable: false,
             color: null
@@ -62,15 +64,17 @@ export default {
             which: 0,
             top: 0,
             left: 0,
-            max: 5,
-            disable: false,
+            rotation:0,
+            max: 8,
+            disable: true,
             color: null
           },
           eyes: {
             which: 0,
             top: 0,
             left: 0,
-            max:16,
+            rotation: 0,
+            max:18,
             disable: false,
             color: null
           },
@@ -78,6 +82,7 @@ export default {
             which: 0,
             top: 0,
             left: 0,
+            rotation: 0,
             max:7,
             disable: false,
             color: null
@@ -86,7 +91,8 @@ export default {
             which: 0,
             top: 0,
             left: 0,
-            max: 7,
+            rotation: 0,
+            max: 8,
             disable: false,
             color: null
           },
@@ -94,6 +100,7 @@ export default {
             which: 0,
             top: 0,
             left: 0,
+            rotation: 0,
             max: 6,
             disable: false,
             color: null
@@ -102,30 +109,43 @@ export default {
             which: 0,
             top: 0,
             left: 0,
+            rotation: 0,
             max: 3,
-            disable: false,
+            disable: true,
             color: null
           },
           ears: {
             which: 0,
             top: 2,
             left: 0,
-            max: 1,
-            disable: false,
+            rotation: 0,
+            max: 2,
+            disable: true,
             color: null
           },
           hair: {
             which: 0,
             top: 2,
             left: 0,
+            rotation: 0,
             max: 8,
             disable: false,
+            color: null
+          },
+          hairExtra: {
+            which: 0,
+            top: 0,
+            left: 0,
+            rotation: 0,
+            max: 2,
+            disable: true,
             color: null
           },
           clothes: {
             which: 0,
             top: 2,
             left: 0,
+            rotation: 0,
             max: 6,
             disable: false,
             color: null
@@ -140,6 +160,7 @@ export default {
         beard: null,
         ears: null,
         hair: null,
+        hairExtra: null,
         clothes: null,
       },
       defaultColor:'rgba(255,255,255,0.1)',
@@ -180,15 +201,24 @@ export default {
     init(){
       this.ctx.clearRect(0,0,500,500)
 
-      let optionsLoop = ['body', 'extras', 'eyes', 'brows', 'mouth', 'nose', 'beard', 'ears', 'hair', 'clothes'];
+      let optionsLoop = ['body', 'extras', 'eyes', 'brows', 'mouth', 'nose', 'beard', 'ears', 'hair', 'hairExtra', 'clothes'];
 
       let i = 0;
 
       for(let selection in this.selections){
         if(this.selections[selection].disable === false) {
           this.stagectx.globalCompositeOperation = "source-over";
-          this.stagectx.drawImage(this.options[optionsLoop[i]], this.selections[selection].which*500, 0, 500, 500, this.selections[selection].top, this.selections[selection].left, 500, 500);
           
+          if (this.selections[selection].rotation !== 0) {
+            this.stagectx.save();
+            this.stagectx.translate(250, 250);
+            this.stagectx.rotate(Math.PI / 4 * (-this.selections[selection].rotation / 2));
+            this.stagectx.translate(-250, -250); 
+          }
+            
+          this.stagectx.drawImage(this.options[optionsLoop[i]], this.selections[selection].which*500, 0, 500, 500, this.selections[selection].top, this.selections[selection].left, 500, 500);
+          this.stagectx.restore(); 
+
           if (this.selections[selection].color !== null) {
             this.stagectx.fillStyle = this.selections[selection].color;
             this.stagectx.globalCompositeOperation = "source-atop";
@@ -232,6 +262,17 @@ export default {
       this.selections[this.active].disable = false;
       this.init();
     },
+    rotateCanvas() {
+      this.selections[this.active].rotation += 15;
+      if(this.selections[this.active].rotation >= 360) {
+        this.selections[this.active].rotation = 0;
+      }
+      this.init()
+    },
+    resetRotation(){
+       this.selections[this.active].rotation = 0;
+       this.init();
+    },
     disableItem(e) {
       if(e === 'disable') {
         this.selections[this.active].disable = true;
@@ -258,6 +299,7 @@ export default {
         this.selections[selection].top = 0;
         this.selections[selection].which = randomPick;
         this.selections[selection].color = null;
+        this.selections[selection].rotation = 0;
         this.init();
     }
     }
@@ -299,6 +341,10 @@ export default {
     let hair = new Image();
     hair.src = require("@/assets/imgs/hair.png");
     this.options.hair = hair;
+    
+    let hairExtra = new Image();
+    hairExtra.src = require("@/assets/imgs/hairExtra.png");
+    this.options.hairExtra = hairExtra;
 
     let clothes = new Image();
     clothes.src = require("@/assets/imgs/clothes.png");

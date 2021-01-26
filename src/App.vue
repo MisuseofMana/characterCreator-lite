@@ -26,8 +26,10 @@ export default {
     CharacterCanvas,
     LoadingSpinner,
   },
-  methods () {
-    this.loading = !this.loading
+  methods: {
+    toggleLoading(){
+      this.loading = !this.loading
+    }
   }
 }
 </script>

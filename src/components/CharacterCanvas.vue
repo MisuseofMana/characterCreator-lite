@@ -67,7 +67,7 @@ export default {
       active: 'body',
       selections: [
         {
-          name:'hair back',
+          name:'hair-back',
           sprites: {
             lines:[],
             flats:[],
@@ -227,7 +227,7 @@ export default {
         },
 
         {
-          name:'hair front',
+          name:'hair-front',
           sprites: {
             lines:[],
             flats:[],
@@ -491,9 +491,10 @@ export default {
     let spriteOrder = spriteOptions[order];
 
     let promiseArray = this.selections.map((item, index) => {
-      let numberOfImages = require(`@/assets/sprites/${item.name}/${spriteOrder}/count.js`);
+      let numberOfImages = require(`@/assets/sprites/${item.name}/count.js`);
+      console.log(numberOfImages)
         let imagePromise = new Promise((resolve, reject) => {
-          if(numberOfImages){
+          if(numberOfImages !== null){
             for( let folders = 0; folders <= spriteOptions.length-1; folders++ ) {
               for(let imageCount = 0; imageCount <= numberOfImages; imageCount++) {
                 console.log(numberOfImages)

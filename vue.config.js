@@ -1,4 +1,5 @@
 module.exports = {
     outputDir: "docs",
-    publicPath: '/characterCreator-MoDun/'
+    publicPath: '/characterCreator-MoDun/',
+    
   }

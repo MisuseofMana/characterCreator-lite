@@ -1,39 +1,53 @@
 <template>
 <div class="flexRow">
-
   <div class="flexColumn">
     <div class="flexRowFit">
-      <div v-for="(mods, name) in selections" :key="selections[mods]">
-        <PartMenu @current-open="setActive($event)" :type="name" :open.sync="active"> </PartMenu>
+      <div class="menuItemPad" v-for="(mods) in selections" :key="mods.name+'menu'">
+        <PartMenu @current-open="setActive($event)" :type="mods.name" :open.sync="active"> </PartMenu>
       </div>
     </div>
 
-    <div class="flexRowFit">
+    <div class="flexRow">
       <transition name="fade" mode="out-in">
         <PartEditor
           @change-position="moveSprite($event)" 
           @new-pick="pickNewItem($event)"
+          @random-item="randomItem()"
           @disable-item="disableItem($event)"
           @change-color="changeColor($event)"
-          @randomize-character="randomize()"
-          @reset-character="reset()"
-          @rotate-canvas="rotateCanvas()"
+          @rotate-canvas="rotateCanvas($event)"
           @reset-rotation="resetRotation()"
+          @scale-sprite="scaleSprite($event)"
+          @move-layer="moveLayer($event)"
+          :hidden="selections[activeIndex].disable"
           :type="active" 
-          :maxRange="selections[active].max" 
+          :maxRange="selections[activeIndex].max" 
           :key="`${active}editor`" 
-          :selected="selections[active].which" 
+          :which="selections[activeIndex].which"
         />
       </transition>
     </div>
+  
+      <div class="flexRowFit">
+          <div class="border margin arrow" @click="randomize()">
+              <font-awesome-icon :icon="['fas', 'dice']" />
+          </div>
+          <div class="border margin arrow" @click="reset()">
+              <font-awesome-icon :icon="['fas', 'sync']" />
+          </div>
+      </div>
+  
   </div>
   
-  <div class="flexColumn">
+  <div class="flexColumnCenter">
     <canvas id="canvas" width="500" height="500"></canvas>
-    <p>Right click character and click save image as to download. Have fun!</p>
+    <div id="download" @click="downloadImage()">
+      <p class="border">DOWNLOAD CHARACTER</p>
+    </div>
   </div>
 
-  <canvas id="stageCanvas" class="hidden" width="500" height="500"></canvas>
+
+  <canvas class="hidden" id="stageCanvas" width="500" height="500"></canvas>
 
 </div>
 </template>
@@ -49,120 +63,205 @@ export default {
   },
   data() {
     return {
+      loading:true,
       active: 'body',
-      selections: {
-          body: {
-            which: 0,
-            top: 0,
-            left: 0,
-            rotation: 0,
-            max: 5,
-            disable: false,
-            color: null
+      selections: [
+        {
+          name:'hair back',
+          sprites: {
+            lines:[],
+            flats:[],
+            options:[],
           },
-          extras:{
-            which: 0,
-            top: 0,
-            left: 0,
-            rotation:0,
-            max: 8,
-            disable: true,
-            color: null
+          which: 0,
+          top: 0,
+          left: 0,
+          rotation: 0,
+          scaleWidth:500,
+          scaleHeight:500,
+          max: 0,
+          disable: true,
+          color: null
+        },
+        {
+          name: 'body',
+          sprites: {
+            lines:[],
+            flats:[],
+            options:[],
           },
-          eyes: {
-            which: 0,
-            top: 0,
-            left: 0,
-            rotation: 0,
-            max:18,
-            disable: false,
-            color: null
+          which: 0,
+          top: 2,
+          left: 0,
+          rotation: 0,
+          scaleWidth:500,
+          scaleHeight:500,
+          max: 0,
+          disable: false,
+          color: null
+        },
+        {
+          name: 'extras',
+          sprites: {
+            lines:[],
+            flats:[],
+            options:[],
           },
-          brows: {
-            which: 0,
-            top: 0,
-            left: 0,
-            rotation: 0,
-            max:7,
-            disable: false,
-            color: null
+          which: 0,
+          top: 0,
+          left: 0,
+          rotation:0,
+          scaleWidth:500,
+          scaleHeight:500,
+          max: 0,
+          disable: true,
+          color: null
+        },
+
+        {
+          name:'eyes',
+          sprites: {
+            lines:[],
+            flats:[],
+            options:[],
           },
-          mouth: {
-            which: 0,
-            top: 0,
-            left: 0,
-            rotation: 0,
-            max: 8,
-            disable: false,
-            color: null
+          which: 0,
+          top: 0,
+          left: 0,
+          rotation: 0,
+          scaleWidth:500,
+          scaleHeight:500,
+          max:0,
+          disable: false,
+          color: null
+        },
+
+        {
+          name:'brows',
+          sprites: {
+            lines:[],
+            flats:[],
+            options:[],
           },
-          nose: {
-            which: 0,
-            top: 0,
-            left: 0,
-            rotation: 0,
-            max: 6,
-            disable: false,
-            color: null
+          which: 0,
+          top: 0,
+          left: 0,
+          rotation: 0,
+          scaleWidth:500,
+          scaleHeight:500,
+          max:0,
+          disable: false,
+          color: null
+        },
+
+        {
+          name:'mouth',
+          sprites: {
+            lines:[],
+            flats:[],
+            options:[],
           },
-          beard: {
-            which: 0,
-            top: 0,
-            left: 0,
-            rotation: 0,
-            max: 3,
-            disable: true,
-            color: null
+          which: 0,
+          top: 0,
+          left: 0,
+          rotation: 0,
+          scaleWidth:500,
+          scaleHeight:500,
+          max: 0,
+          disable: false,
+          color: null
+        },
+
+        {
+          name:'nose',
+          sprites: {
+            lines:[],
+            flats:[],
+            options:[],
           },
-          ears: {
-            which: 0,
-            top: 2,
-            left: 0,
-            rotation: 0,
-            max: 2,
-            disable: true,
-            color: null
+          which: 0,
+          top: 0,
+          left: 0,
+          rotation: 0,
+          scaleWidth:500,
+          scaleHeight:500,
+          max: 0,
+          disable: false,
+          color: null
+        },
+
+        {
+          name:'beard',
+          sprites: {
+            lines:[],
+            flats:[],
+            options:[],
           },
-          hair: {
-            which: 0,
-            top: 2,
-            left: 0,
-            rotation: 0,
-            max: 8,
-            disable: false,
-            color: null
+          which: 0,
+          top: 0,
+          left: 0,
+          rotation: 0,
+          scaleWidth:500,
+          scaleHeight:500,
+          max: 0,
+          disable: true,
+          color: null
+        },
+
+        {
+          name:'ears',
+          sprites: {
+            lines:[],
+            flats:[],
+            options:[],
           },
-          hairExtra: {
-            which: 0,
-            top: 0,
-            left: 0,
-            rotation: 0,
-            max: 2,
-            disable: true,
-            color: null
+          which: 0,
+          top: 2,
+          left: 0,
+          rotation: 0,
+          scaleWidth:500,
+          scaleHeight:500,
+          max: 0,
+          disable: true,
+          color: null
+        },
+
+        {
+          name:'hair front',
+          sprites: {
+            lines:[],
+            flats:[],
+            options:[],
           },
-          clothes: {
-            which: 0,
-            top: 2,
-            left: 0,
-            rotation: 0,
-            max: 6,
-            disable: false,
-            color: null
+          which: 0,
+          top: 2,
+          left: 0,
+          rotation: 0,
+          scaleWidth:500,
+          scaleHeight:500,
+          max: 0,
+          disable: false,
+          color: null
+        },
+        {
+          name:'clothes',
+          sprites: {
+            lines:[],
+            flats:[],
+            options:[],
           },
-      },
-      options: {
-        body: null,
-        extras: null,
-        eyes: null,
-        mouth: null,
-        nose: null,
-        beard: null,
-        ears: null,
-        hair: null,
-        hairExtra: null,
-        clothes: null,
-      },
+          which: 0,
+          top: 2,
+          left: 0,
+          rotation: 0,
+          scaleWidth:500,
+          scaleHeight:500,
+          max: 0,
+          disable: false,
+          color: null
+        },
+      ],
+      disabledByDefault: ['extras', 'beard', 'hairExtra'],
       defaultColor:'rgba(255,255,255,0.1)',
       colors: {
         none: null,
@@ -187,11 +286,18 @@ export default {
     ctx () {
       return this.canvas.getContext('2d');
     },
-    stageCanvas() {
+    stageCanvas () {
       return document.getElementById('stageCanvas')
     },
     stagectx () {
       return this.stageCanvas.getContext('2d');
+    },
+    activeIndex () {
+      const findActive = (item) => item.name === this.active;
+      return this.selections.findIndex(findActive);
+    },
+    downloadButton () {
+     return document.getElementById('download');
     }
   },
   methods:{
@@ -201,26 +307,22 @@ export default {
     init(){
       this.ctx.clearRect(0,0,500,500)
 
-      let optionsLoop = ['body', 'extras', 'eyes', 'brows', 'mouth', 'nose', 'beard', 'ears', 'hair', 'hairExtra', 'clothes'];
-
-      let i = 0;
-
-      for(let selection in this.selections){
-        if(this.selections[selection].disable === false) {
+      for(let selection of this.selections){
+        if(selection.disable === false) {
           this.stagectx.globalCompositeOperation = "source-over";
           
-          if (this.selections[selection].rotation !== 0) {
+          if (selection.rotation !== 0) {
             this.stagectx.save();
             this.stagectx.translate(250, 250);
-            this.stagectx.rotate(Math.PI / 4 * (-this.selections[selection].rotation / 2));
+            this.stagectx.rotate(Math.PI / 12 * (selection.rotation));
             this.stagectx.translate(-250, -250); 
           }
             
-          this.stagectx.drawImage(this.options[optionsLoop[i]], this.selections[selection].which*500, 0, 500, 500, this.selections[selection].top, this.selections[selection].left, 500, 500);
+          this.stagectx.drawImage(selection.sprites, selection.which*500, 0, 500, 500, selection.top, selection.left, selection.scaleWidth, selection.scaleHeight);
           this.stagectx.restore(); 
 
-          if (this.selections[selection].color !== null) {
-            this.stagectx.fillStyle = this.selections[selection].color;
+          if (selection.color !== null) {
+            this.stagectx.fillStyle = selection.color;
             this.stagectx.globalCompositeOperation = "source-atop";
             this.stagectx.fillRect(0, 0, 500, 500);
           }
@@ -229,148 +331,249 @@ export default {
           this.ctx.drawImage(this.stageCanvas, 0, 0, 500, 500, 0, 0, 500, 500);
           this.stagectx.clearRect(0,0,500,500)
         }
-        i++
       }
     },
     moveSprite(e) {
       if(e.direction === 'y'){
-        this.selections[this.active].left += e.value;
+        this.selections[this.activeIndex].left += e.value;
       }
 
       if(e.direction === 'x') {
-        this.selections[this.active].top += e.value;
+        this.selections[this.activeIndex].top += e.value;
       }
 
       if(e.direction === 'xy-neg') {
-        this.selections[this.active].left += e.value;
-        this.selections[this.active].top += e.value
+        this.selections[this.activeIndex].left += e.value;
+        this.selections[this.activeIndex].top += e.value
       }
 
       if(e.direction === 'xy-pos') {
-        this.selections[this.active].left += e.value;
-        this.selections[this.active].top -= e.value
+        this.selections[this.activeIndex].left += e.value;
+        this.selections[this.activeIndex].top -= e.value
       }
 
       if(e.direction === 'reset') {
-        this.selections[this.active].left = 0;
-        this.selections[this.active].top = 0;
+        this.selections[this.activeIndex].left = 0;
+        this.selections[this.activeIndex].top = 0;
       }
         this.init();
     },
-    pickNewItem(e) {
-      this.selections[this.active].which = e;
-      this.selections[this.active].disable = false;
+    scaleSprite(e) {
+      if(e === 'tall' || e === 'up') {
+        this.selections[this.activeIndex].scaleHeight += 5;
+        this.selections[this.activeIndex].top -= 5;
+      }
+      if(e === 'short' || e === 'down') {
+        this.selections[this.activeIndex].scaleHeight -= 5;
+      }
+      if(e === 'wide' || e === 'up') {
+        this.selections[this.activeIndex].scaleWidth += 5;
+      }
+      if(e === 'thin' || e === 'down') {
+        this.selections[this.activeIndex].scaleWidth -= 5;
+      }
+      if(e === 'reset') {
+        this.selections[this.activeIndex].scaleWidth = 500;
+        this.selections[this.activeIndex].scaleHeight = 500;
+      }
       this.init();
     },
-    rotateCanvas() {
-      this.selections[this.active].rotation += 15;
-      if(this.selections[this.active].rotation >= 360) {
-        this.selections[this.active].rotation = 0;
+    pickNewItem(e) {
+      this.selections[this.activeIndex].which = e;
+      this.selections[this.activeIndex].disable = false;
+      this.init();
+    },
+    rotateCanvas(e) {
+      if(e === 'clockwise'){
+        this.selections[this.activeIndex].rotation++;
+      }
+      if(e === 'counterclockwise'){
+        this.selections[this.activeIndex].rotation--;
+      }
+      if(this.selections[this.activeIndex].rotation >= 24) {
+        this.selections[this.activeIndex].rotation = 0;
       }
       this.init()
     },
     resetRotation(){
-       this.selections[this.active].rotation = 0;
+       this.selections[this.activeIndex].rotation = 0;
        this.init();
     },
     disableItem(e) {
       if(e === 'disable') {
-        this.selections[this.active].disable = true;
+        this.selections[this.activeIndex].disable = true;
+        this.init();
+      }
+
+      if(e === 'enable') {
+        this.selections[this.activeIndex].disable = false;
         this.init();
       }
     },
+    moveLayer(e) {
+      let indexFrom = this.activeIndex;
+      let forwardIndex = indexFrom++;
+      let backwardIndex = indexFrom--;
+      console.log(backwardIndex, indexFrom, forwardIndex, )
+
+      if(forwardIndex > this.selections.length - 1) {
+        forwardIndex = 0;
+      }
+
+      if(backwardIndex < 0) {
+        backwardIndex = this.selections.length - 1;
+      }
+
+      let movingItem = this.selections[indexFrom]
+      console.log(movingItem.name)
+      
+      if(e === 'up') {
+        this.selections[indexFrom] = this.selections[forwardIndex];
+        this.selections[forwardIndex] = movingItem;
+      }
+
+      if(e === 'down') {
+        this.selections[indexFrom] = this.selections[backwardIndex];
+        this.selections[backwardIndex] = movingItem;
+      }
+
+      this.init();
+    },
+    randomItem(){
+      let randomPick = Math.floor(Math.random() * this.selections[this.activeIndex].max);
+      this.selections[this.activeIndex].which = randomPick;
+      this.selections[this.activeIndex].disable = false;
+      this.init();
+    },
     changeColor(e) {
-      this.selections[this.active].color = this.colors[e];
+      this.selections[this.activeIndex].color = this.colors[e];
       this.init();
     },
     randomize() {
-      for(let selection in this.selections){
-        let randomPick = Math.floor(Math.random() * this.selections[selection].max);
-        this.selections[selection].which = randomPick;
+      for(let selection of this.selections){
+        let randomPick = Math.floor(Math.random() * selection.max);
+        selection.which = randomPick;
         let randomColor = Math.floor(Math.random() * this.colorList.length-1);
-        this.selections[selection].color = this.colors[this.colorList[randomColor]];
+        selection.color = this.colors[this.colorList[randomColor]];
+        selection.disable = false;
         this.init()
       }
     },
     reset() {
-      for(let selection in this.selections){
-        let randomPick = Math.floor(Math.random() * this.selections[selection].max);
-        this.selections[selection].left = 0;
-        this.selections[selection].top = 0;
-        this.selections[selection].which = randomPick;
-        this.selections[selection].color = null;
-        this.selections[selection].rotation = 0;
+      for(let selection of this.selections){
+        let randomPick = Math.floor(Math.random() * selection.max);
+        selection.left = 0;
+        selection.top = 0;
+        selection.which = randomPick;
+        selection.color = null;
+        selection.rotation = 0;
+        selection.scaleWidth = 500;
+        selection.scaleHeight = 500;
+        if(this.disabledByDefault.includes(selection.name)) {
+          selection.disable = true;
+        }
+    }
         this.init();
-    }
-    }
+    },
+    downloadImage(){
+    let downloadLink = document.createElement('a');
+    downloadLink.setAttribute('download', 'YourAdventurer.png');
+    this.canvas.toBlob(function(blob) {
+      let url = URL.createObjectURL(blob);
+      downloadLink.setAttribute('href', url);
+      downloadLink.click();
+    });
+}
   },
   mounted(){
+    let order = 0;
+    let spriteOptions = ['line', 'flat', 'option']
+    let spriteOrder = spriteOptions[order];
 
-    let bodys = new Image();
-    bodys.src = require("@/assets/imgs/bodys.png");
-    this.options.body = bodys;
-    
-    let extras = new Image();
-    extras.src = require("@/assets/imgs/extras.png");
-    this.options.extras = extras;
-    
-    let eyes = new Image();
-    eyes.src = require("@/assets/imgs/eyes.png");
-    this.options.eyes = eyes;
-    
-    let brows = new Image();
-    brows.src = require("@/assets/imgs/brows.png");
-    this.options.brows = brows;
+    let promiseArray = this.selections.map((item, index) => {
+      let numberOfImages = require(`@/assets/sprites/${item.name}/${spriteOrder}/count.js`);
+        let imagePromise = new Promise((resolve, reject) => {
+          if(numberOfImages){
+            for( let folders = 0; folders <= spriteOptions.length-1; folders++ ) {
+              for(let imageCount = 0; imageCount <= numberOfImages; imageCount++) {
+                console.log(numberOfImages)
+                let img = new Image();
+                img.src = require(`@/assets/sprites/${item.name}/${spriteOrder}/${index + 1}.png`);
+                img.onload = () => {
+                  this.selections[index].sprites.spriteOrder.push(img)
+                  this.selections[index].max = numberOfImages;
+                  resolve();
+                }
+                img.error = () => {
+                  reject('An image loaded incorrectly. Try refreshing');
+                }
+              }
+            }
+          }
+        });
+      return imagePromise;
+    });
 
-    let mouth = new Image();
-    mouth.src = require("@/assets/imgs/mouth.png");
-    this.options.mouth = mouth;
-
-    let nose = new Image();
-    nose.src = require("@/assets/imgs/nose.png");
-    this.options.nose = nose;
-
-    let beard = new Image();
-    beard.src = require("@/assets/imgs/beard.png");
-    this.options.beard = beard;
-
-    let ears = new Image();
-    ears.src = require("@/assets/imgs/ears.png");
-    this.options.ears = ears;
-
-    let hair = new Image();
-    hair.src = require("@/assets/imgs/hair.png");
-    this.options.hair = hair;
-    
-    let hairExtra = new Image();
-    hairExtra.src = require("@/assets/imgs/hairExtra.png");
-    this.options.hairExtra = hairExtra;
-
-    let clothes = new Image();
-    clothes.src = require("@/assets/imgs/clothes.png");
-    this.options.clothes = clothes;
-
-    for(let selection in this.selections){
-      let randomPick = Math.floor(Math.random() * this.selections[selection].max);
-      this.selections[selection].which = randomPick;
-    }
-
-    clothes.onload = () => {
-      this.init();
-    };
-
-
-  },
+    Promise.all(promiseArray).then(() => {
+      this.selections.forEach((item, index) => {
+        let randomPick = Math.floor(Math.random() * item.max);
+        this.selections[index].which = randomPick;
+      })
+      this.$emit('loaded-success')
+      this.init()
+    })
+  }
 }
 </script>
 
 <style scoped>
-  button {
-    padding:10px;
-  }
-
   .hidden {
     display:none;
+  }
+
+@media (min-width: 768px) {
+  #download {
+    text-align:center;
+    transition: all .1s;
+  }
+
+  #download p {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  #download:hover {
+    background:rgb(136, 255, 215);
+    transform:scale(1.05);
+    transition: all .1s;
+    cursor:pointer;
+  }
+
+  .border {
+      border:solid 1px black;
+      padding:10px;
+  }
+
+  .margin {
+      margin:5px;
+      width:15px;
+      height:15px;
+      display:flex;
+      align-items: center;
+      justify-content: center;
+  }
+
+  .arrow {
+    cursor:pointer;
+    transition: all .1s;
+  }
+
+  button {
+    padding:10px;
   }
 
   #canvas {
@@ -378,9 +581,8 @@ export default {
   }
 
   .flexRowFit {
-    max-width:50vw;
-    margin-right:50px;
-    padding:10px;
+    margin:0 50px 10px 0;
+    padding:0px 10px 0 0;
     display:flex;
     flex-wrap:wrap;
     flex-direction:row;
@@ -389,18 +591,16 @@ export default {
   }
 
   .flexColumn {
-    padding:10px;
-    max-width:50vw;
     margin-right:50px;
-    float:left;
+    max-width:70vw;
     display:flex;
     flex-direction:column;
-    justify-content:flex-start;
-    align-items:flex-start;
   }
   
   .flexRow {
     display:flex;
+    justify-content:center;
+    align-items:center;
     margin:5px 0;
   }
 
@@ -411,4 +611,5 @@ export default {
   .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0;
   }
+}
 </style>

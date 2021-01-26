@@ -1,16 +1,10 @@
 <template>
-    <div>
-        <h2 @click="$emit('current-open', type)" class="pointer" :class="{'active' : isOpen}">{{ type.toUpperCase() }}</h2>
-    </div>
+    <h3 @click="$emit('current-open', type)" class="pointer" :class="{'active' : isOpen}">{{ type.toUpperCase() }}</h3>
 </template>
 
 <script>
     export default {
         props:['type', 'open'],
-        data() {
-            return {
-            }
-        },
         computed: {
             isOpen(){
                 if (this.open === this.type) return true;
@@ -26,11 +20,26 @@
     }
 
     .pointer {
+        display:block;
         cursor:pointer;
         transition: all .1s;
-        padding:10px;
+        padding:10px 0px;
         border:solid 1px black;
-        margin-right:10px
+        margin: 0 0px 10px 0;
+    }
+
+    h3{
+        font-size:10px;
+        display:block;
+    }
+
+    @media (min-width: 768px) {
+        .pointer {
+        cursor:pointer;
+        transition: all .1s;
+        padding:10px 10px;
+        border:solid 1px black;
+        margin: 0 10px 10px 0;
     }
 
     .pointer:hover {
@@ -38,7 +47,11 @@
         transition: all .1s;
     }
 
-    .fullSpan {
-        width:100%;
+    h3{
+        display:block;
+        font-size:16px;
+        margin:10px;
+        padding:10px;
+    }
     }
 </style>

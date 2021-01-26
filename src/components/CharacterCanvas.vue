@@ -191,24 +191,6 @@ export default {
         },
 
         {
-          name:'beard',
-          sprites: {
-            lines:[],
-            flats:[],
-            options:[],
-          },
-          which: 0,
-          top: 0,
-          left: 0,
-          rotation: 0,
-          scaleWidth:500,
-          scaleHeight:500,
-          max: 0,
-          disable: true,
-          color: null
-        },
-
-        {
           name:'ears',
           sprites: {
             lines:[],
@@ -487,17 +469,15 @@ export default {
   },
   mounted(){
     let order = 0;
-    let spriteOptions = ['line', 'flat', 'option']
+    let spriteOptions = ['flatCount', 'lineCount', 'optionsCount']
     let spriteOrder = spriteOptions[order];
 
     let promiseArray = this.selections.map((item, index) => {
       let numberOfImages = require(`@/assets/sprites/${item.name}/count.js`);
-      console.log(numberOfImages)
         let imagePromise = new Promise((resolve, reject) => {
-          if(numberOfImages !== null){
+          if(numberOfImages.default[spriteOrder] !== null){
             for( let folders = 0; folders <= spriteOptions.length-1; folders++ ) {
-              for(let imageCount = 0; imageCount <= numberOfImages; imageCount++) {
-                console.log(numberOfImages)
+              for(let imageCount = 0; imageCount <= numberOfImages.default[spriteOptions]; imageCount++) {
                 let img = new Image();
                 img.src = require(`@/assets/sprites/${item.name}/${spriteOrder}/${index + 1}.png`);
                 img.onload = () => {

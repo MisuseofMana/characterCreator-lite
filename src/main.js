@@ -1,8 +1,15 @@
 import Vue from 'vue'
 import App from './App.vue'
 
+import { BootstrapVue } from 'bootstrap-vue'
+
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
+Vue.use(BootstrapVue)
+
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faDice, faLayerGroup, faSlash, faCompressAlt, faCompressArrowsAlt, faExpandAlt, faExpandArrowsAlt, faUndo, faBan, faArrowUp, faArrowLeft, faArrowRight, faArrowDown, faCircle, faAngleDoubleDown, faAngleDoubleUp, faAngleDoubleLeft, faAngleDoubleRight, faSync } from '@fortawesome/free-solid-svg-icons'
+import { faDice, faHandPointUp, faPalette, faLayerGroup, faSlash, faCompressAlt, faCompressArrowsAlt, faExpandAlt, faExpandArrowsAlt, faUndo, faBan, faArrowUp, faArrowLeft, faArrowRight, faArrowDown, faCircle, faAngleDoubleDown, faAngleDoubleUp, faAngleDoubleLeft, faAngleDoubleRight, faSync } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faArrowUp)
@@ -24,6 +31,8 @@ library.add(faCompressArrowsAlt)
 library.add(faExpandAlt)
 library.add(faExpandArrowsAlt)
 library.add(faLayerGroup)
+library.add(faHandPointUp)
+library.add(faPalette)
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 

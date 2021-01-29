@@ -1,14 +1,24 @@
 <template>
-<div class="flexRow">
-  <div class="flexColumn">
-    <div class="flexRowFit">
-      <div class="menuItemPad" v-for="(mods) in selections" :key="mods.name+'menu'">
-        <PartMenu @current-open="setActive($event)" :type="mods.name" :open.sync="active"> </PartMenu>
-      </div>
-    </div>
+<b-row>
+  <b-col sm="12" md="2" lg="2">
+    <b-row>
+        <PartMenu @current-open="setActive($event)" type="body" :open.sync="active"> </PartMenu>
+        <PartMenu @current-open="setActive($event)" type="eyes" :open.sync="active"> </PartMenu>
+        <PartMenu @current-open="setActive($event)" type="brows" :open.sync="active"> </PartMenu>
 
-    <div class="flexRow">
-      <transition name="fade" mode="out-in">
+        <PartMenu @current-open="setActive($event)" type="nose" :open.sync="active"> </PartMenu>
+        <PartMenu @current-open="setActive($event)" type="mouth" :open.sync="active"> </PartMenu>
+        <PartMenu @current-open="setActive($event)" type="ears" :open.sync="active"> </PartMenu>
+
+        <PartMenu @current-open="setActive($event)" type="hair-front" :open.sync="active"> </PartMenu>
+        <PartMenu @current-open="setActive($event)" type="hair-back" :open.sync="active"> </PartMenu>
+        <PartMenu @current-open="setActive($event)" type="clothes" :open.sync="active"> </PartMenu>
+
+        <PartMenu @current-open="setActive($event)" type="extras" :open.sync="active"> </PartMenu>
+    </b-row>
+  </b-col>
+
+      
         <PartEditor
           @change-position="moveSprite($event)" 
           @new-pick="pickNewItem($event)"
@@ -19,47 +29,40 @@
           @reset-rotation="resetRotation()"
           @scale-sprite="scaleSprite($event)"
           @move-layer="moveLayer($event)"
+          @randomize-character="randomize()"
+          @reset-character="reset()"
           :hidden="selections[activeIndex].disable"
           :type="active" 
           :maxRange="selections[activeIndex].max" 
           :key="`${active}editor`" 
           :which="selections[activeIndex].which"
         />
-      </transition>
-    </div>
-  
-      <div class="flexRowFit">
-          <div class="border margin arrow" @click="randomize()">
-              <font-awesome-icon :icon="['fas', 'dice']" />
-          </div>
-          <div class="border margin arrow" @click="reset()">
-              <font-awesome-icon :icon="['fas', 'sync']" />
-          </div>
+
+
+
+  <b-col sm="12" md="6" lg="5">
+      <canvas id="canvas" width="500" height="500"></canvas>
+      <div id="download" @click="downloadImage()">
+        <p class="border">DOWNLOAD CHARACTER</p>
       </div>
+      <LoadingSpinner v-show="false" key="loader"/>
+  </b-col>
   
-  </div>
-  
-  <div class="flexColumnCenter">
-    <canvas id="canvas" width="500" height="500"></canvas>
-    <div id="download" @click="downloadImage()">
-      <p class="border">DOWNLOAD CHARACTER</p>
-    </div>
-  </div>
+  <canvas class="hidden" width="500" height="500" id="stageCanvas"></canvas>
 
-
-  <canvas class="hidden" id="stageCanvas" width="500" height="500"></canvas>
-
-</div>
+</b-row>
 </template>
 
 <script>
 import PartMenu from '@/components/PartMenu'
 import PartEditor from '@/components/PartEditor'
+import LoadingSpinner from '@/components/LoadingSpinner'
 
 export default {
   components: {
     PartMenu,
     PartEditor,
+    LoadingSpinner
   },
   data() {
     return {
@@ -69,69 +72,58 @@ export default {
         {
           name:'hair-back',
           sprites: {
-            lines:[],
-            flats:[],
-            options:[],
+            flat:[],
+            flatImg: null,
+            line:[],
+            lineImg: null,
           },
+          optionOn: false,
           which: 0,
           top: 0,
           left: 0,
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 0,
-          disable: true,
+          max: 6,
+          disable: false,
           color: null
         },
         {
           name: 'body',
           sprites: {
-            lines:[],
-            flats:[],
-            options:[],
+            flat:[],
+            flatImg:null,
+            line:[],
+            lineImg:null,
           },
+          optionOn: false,
           which: 0,
           top: 2,
           left: 0,
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 0,
+          max: 6,
           disable: false,
-          color: null
-        },
-        {
-          name: 'extras',
-          sprites: {
-            lines:[],
-            flats:[],
-            options:[],
-          },
-          which: 0,
-          top: 0,
-          left: 0,
-          rotation:0,
-          scaleWidth:500,
-          scaleHeight:500,
-          max: 0,
-          disable: true,
           color: null
         },
 
         {
           name:'eyes',
           sprites: {
-            lines:[],
-            flats:[],
-            options:[],
+            flat:[],
+            flatImg:null,
+            line:[],
+            lineImg:null,
           },
+          optionOn: false,
           which: 0,
           top: 0,
           left: 0,
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max:0,
+          max:12,
           disable: false,
           color: null
         },
@@ -139,17 +131,19 @@ export default {
         {
           name:'brows',
           sprites: {
-            lines:[],
-            flats:[],
-            options:[],
+            flat:[],
+            flatImg:null,
+            line:[],
+            lineImg:null,
           },
+          optionOn: false,
           which: 0,
           top: 0,
           left: 0,
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max:0,
+          max:7,
           disable: false,
           color: null
         },
@@ -157,17 +151,19 @@ export default {
         {
           name:'mouth',
           sprites: {
-            lines:[],
-            flats:[],
-            options:[],
+            flat:[],
+            flatImg:null,
+            line:[],
+            lineImg:null,
           },
+          optionOn: false,
           which: 0,
           top: 0,
           left: 0,
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 0,
+          max: 7,
           disable: false,
           color: null
         },
@@ -175,17 +171,19 @@ export default {
         {
           name:'nose',
           sprites: {
-            lines:[],
-            flats:[],
-            options:[],
+            flat:[],
+            flatImg:null,
+            line:[],
+            lineImg:null,
           },
+          optionOn: false,
           which: 0,
           top: 0,
           left: 0,
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 0,
+          max: 7,
           disable: false,
           color: null
         },
@@ -193,57 +191,82 @@ export default {
         {
           name:'ears',
           sprites: {
-            lines:[],
-            flats:[],
-            options:[],
+            flat:[],
+            flatImg:null,
+            line:[],
+            lineImg:null,
           },
+          optionOn: false,
           which: 0,
           top: 2,
           left: 0,
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 0,
-          disable: true,
+          max: 7,
+          disable: false,
+          color: null
+        },
+        
+        {
+          name: 'extras',
+          sprites: {
+            flat:[],
+            flatImg:null,
+            line:[],
+            lineImg:null,
+          },
+          optionOn: false,
+          which: 0,
+          top: 0,
+          left: 0,
+          rotation:0,
+          scaleWidth:500,
+          scaleHeight:500,
+          max: 8,
+          disable: false,
           color: null
         },
 
         {
           name:'hair-front',
           sprites: {
-            lines:[],
-            flats:[],
-            options:[],
+            flat:[],
+            flatImg:null,
+            line:[],
+            lineImg:null,
           },
+          optionOn: false,
           which: 0,
           top: 2,
           left: 0,
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 0,
+          max: 7,
           disable: false,
           color: null
         },
         {
           name:'clothes',
           sprites: {
-            lines:[],
-            flats:[],
-            options:[],
+            flat:[],
+            flatImg:null,
+            line:[],
+            lineImg:null,
           },
+          optionOn: false,
           which: 0,
           top: 2,
           left: 0,
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 0,
+          max: 7,
           disable: false,
           color: null
         },
       ],
-      disabledByDefault: ['extras', 'beard', 'hairExtra'],
       defaultColor:'rgba(255,255,255,0.1)',
       colors: {
         none: null,
@@ -258,7 +281,8 @@ export default {
         blue: 'rgba(1, 94, 201, 0.3)',
         orange: 'rgba(255, 105, 18, 0.3)'
       },
-      colorList:['none','red', 'yellow', 'brown', 'peach', 'black', 'darkbrown', 'purple', 'green', 'blue', 'orange']
+      colorList:['none','red', 'yellow', 'brown', 'peach', 'black', 'darkbrown', 'purple', 'green', 'blue', 'orange'],
+      imagesToLoad:0,
     }
   },
   computed: {
@@ -280,39 +304,86 @@ export default {
     },
     downloadButton () {
      return document.getElementById('download');
-    }
+    },
   },
   methods:{
     setActive(e){
       this.active = e;
     },
-    init(){
+    init() {
+      this.loading = true;
+      this.imagesToLoad = 0;
+      var img;
+        for(let selection in this.selections){
+          if (!this.selections[selection].disable){
+            this.imagesToLoad += 2
+          }
+        }
+
+        for(let selection in this.selections){
+          let current = this.selections[selection]
+          if(!current.disable){
+              for(let i = 0; i < 2; i++){
+                let sources = [current.sprites.flat[current.which], current.sprites.line[current.which]];
+                let targets = ['flatImg', 'lineImg'];
+                img = new Image(500,500);
+                current.sprites[targets[i]] = img;
+                img.onload = () => {
+                  this.imagesToLoad--;
+                  if (this.imagesToLoad <= 0) {
+                    this.loading = false;
+                    this.drawImages();
+                  }
+                }
+                img.onerror = () => {
+                  console.log('error loading image')
+                }
+                try {
+                  img.src = require(`@/assets/sprites/${sources[i]}`);
+                } catch {
+                  this.imagesToLoad--;
+                  current.sprites[targets[i]] = null;
+                }
+          }
+        }
+      }
+    },
+    drawImages(){
       this.ctx.clearRect(0,0,500,500)
 
-      for(let selection of this.selections){
-        if(selection.disable === false) {
-          this.stagectx.globalCompositeOperation = "source-over";
-          
-          if (selection.rotation !== 0) {
-            this.stagectx.save();
-            this.stagectx.translate(250, 250);
-            this.stagectx.rotate(Math.PI / 12 * (selection.rotation));
-            this.stagectx.translate(-250, -250); 
-          }
-            
-          this.stagectx.drawImage(selection.sprites, selection.which*500, 0, 500, 500, selection.top, selection.left, selection.scaleWidth, selection.scaleHeight);
-          this.stagectx.restore(); 
+      for(let selection in this.selections) {
+        this.stagectx.globalCompositeOperation = "source-over";
+        let current = this.selections[selection];
 
-          if (selection.color !== null) {
-            this.stagectx.fillStyle = selection.color;
-            this.stagectx.globalCompositeOperation = "source-atop";
-            this.stagectx.fillRect(0, 0, 500, 500);
-          }
-
-          this.ctx.globalCompositeOperation = "source-over";
-          this.ctx.drawImage(this.stageCanvas, 0, 0, 500, 500, 0, 0, 500, 500);
-          this.stagectx.clearRect(0,0,500,500)
+        if (current.rotation !== 0) {
+          this.stagectx.save();
+          this.stagectx.translate(250, 250);
+          this.stagectx.rotate(Math.PI / 12 * (current.rotation));
+          this.stagectx.translate(-250, -250); 
         }
+        
+          if(current.disable === false) {
+            if(current.sprites.flatImg){
+              this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+            }
+            
+            if (current.color !== null && current.sprites) {
+              this.stagectx.fillStyle = current.color;
+              this.stagectx.globalCompositeOperation = "source-atop";
+              this.stagectx.fillRect(0, 0, 500, 500);
+            }
+            this.stagectx.globalCompositeOperation = "source-over";
+
+            if(current.sprites.lineImg){
+              this.stagectx.drawImage(current.sprites.lineImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+            }
+          }
+
+        this.stagectx.restore(); 
+        
+        
+        this.ctx.drawImage(this.stageCanvas, 0, 0, 500, 500, 0, 0, 500, 500);
+        this.stagectx.clearRect(0,0,500,500);
       }
     },
     moveSprite(e) {
@@ -342,21 +413,26 @@ export default {
     },
     scaleSprite(e) {
       if(e === 'tall' || e === 'up') {
-        this.selections[this.activeIndex].scaleHeight += 5;
+        this.selections[this.activeIndex].scaleHeight += 10;
         this.selections[this.activeIndex].top -= 5;
       }
       if(e === 'short' || e === 'down') {
-        this.selections[this.activeIndex].scaleHeight -= 5;
+        this.selections[this.activeIndex].scaleHeight -= 10;
+        this.selections[this.activeIndex].top += 5;
       }
       if(e === 'wide' || e === 'up') {
-        this.selections[this.activeIndex].scaleWidth += 5;
+        this.selections[this.activeIndex].scaleWidth += 10;
+        this.selections[this.activeIndex].left -= 5;
       }
       if(e === 'thin' || e === 'down') {
-        this.selections[this.activeIndex].scaleWidth -= 5;
+        this.selections[this.activeIndex].scaleWidth -= 10;
+        this.selections[this.activeIndex].left += 5;
       }
       if(e === 'reset') {
         this.selections[this.activeIndex].scaleWidth = 500;
         this.selections[this.activeIndex].scaleHeight = 500;
+        this.selections[this.activeIndex].left = 0;
+        this.selections[this.activeIndex].top = 0;
       }
       this.init();
     },
@@ -451,9 +527,6 @@ export default {
         selection.rotation = 0;
         selection.scaleWidth = 500;
         selection.scaleHeight = 500;
-        if(this.disabledByDefault.includes(selection.name)) {
-          selection.disable = true;
-        }
     }
         this.init();
     },
@@ -465,44 +538,29 @@ export default {
       downloadLink.setAttribute('href', url);
       downloadLink.click();
     });
-}
+    },
   },
   mounted(){
-    let order = 0;
-    let spriteOptions = ['flatCount', 'lineCount', 'optionsCount']
-    let spriteOrder = spriteOptions[order];
-
-    let promiseArray = this.selections.map((item, index) => {
-      let numberOfImages = require(`@/assets/sprites/${item.name}/count.js`);
-        let imagePromise = new Promise((resolve, reject) => {
-          if(numberOfImages.default[spriteOrder] !== null){
-            for( let folders = 0; folders <= spriteOptions.length-1; folders++ ) {
-              for(let imageCount = 0; imageCount <= numberOfImages.default[spriteOptions]; imageCount++) {
-                let img = new Image();
-                img.src = require(`@/assets/sprites/${item.name}/${spriteOrder}/${index + 1}.png`);
-                img.onload = () => {
-                  this.selections[index].sprites.spriteOrder.push(img)
-                  this.selections[index].max = numberOfImages;
-                  resolve();
-                }
-                img.error = () => {
-                  reject('An image loaded incorrectly. Try refreshing');
-                }
-              }
-            }
+    let random = Math.floor(Math.random() * 6) + 1
+    //add snipped image paths to appropriate arrays in the selections array
+    for(let selection in this.selections){
+      let current = this.selections[selection];
+      current.which = random;
+      let count = current.max;
+      for (let array in current.sprites) {
+        let into = current.sprites[array];
+        for(let image = 1; image <= count; image++){
+          if(into === null){ 
+            // do nothing
           }
-        });
-      return imagePromise;
-    });
-
-    Promise.all(promiseArray).then(() => {
-      this.selections.forEach((item, index) => {
-        let randomPick = Math.floor(Math.random() * item.max);
-        this.selections[index].which = randomPick;
-      })
-      this.$emit('loaded-success')
-      this.init()
-    })
+          else {
+            into.push(`${current.name}/${array}/${image}.png`);
+            this.imgsToLoad++;
+          }
+        }
+      }
+    }
+    this.init();
   }
 }
 </script>
@@ -512,7 +570,6 @@ export default {
     display:none;
   }
 
-@media (min-width: 768px) {
   #download {
     text-align:center;
     transition: all .1s;
@@ -539,58 +596,9 @@ export default {
       padding:10px;
   }
 
-  .margin {
-      margin:5px;
-      width:15px;
-      height:15px;
-      display:flex;
-      align-items: center;
-      justify-content: center;
-  }
-
-  .arrow {
-    cursor:pointer;
-    transition: all .1s;
-  }
-
-  button {
-    padding:10px;
-  }
-
-  #canvas {
+  #canvas, #stageCanvas {
     border: solid 2px black;
+    width: 100%;
+    height: auto;
   }
-
-  .flexRowFit {
-    margin:0 50px 10px 0;
-    padding:0px 10px 0 0;
-    display:flex;
-    flex-wrap:wrap;
-    flex-direction:row;
-    justify-content:flex-start;
-    align-items:flex-start;
-  }
-
-  .flexColumn {
-    margin-right:50px;
-    max-width:70vw;
-    display:flex;
-    flex-direction:column;
-  }
-  
-  .flexRow {
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    margin:5px 0;
-  }
-
-  .fade-enter-active, .fade-leave-active {
-  transition: opacity .2s;
-  }
-
-  .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-    opacity: 0;
-  }
-}
 </style>

@@ -1,39 +1,39 @@
 <template>
-    <b-col md="5" lg="5" class="mb-4">
-        <b-row align-h="center">
-            <b-col sm="5">
-                <p class="tiny" :key="type">{{ type.replace('-', ' ').toUpperCase() }} #{{ selected }}</p>
-            </b-col>
-            <b-col sm="7">
-                <b-form-input  min="0" :max="maxRange-1" v-model="selected" type="range"></b-form-input>
+    <b-col md="5" class="mb-3">
+        <b-row>
+            <b-col cols="12" class="d-flex justify-content-start">
+                <h1 class="responsiveFont" :key="type">{{ type.replace('-', ' ').toUpperCase() }} #{{ selected }}</h1>
             </b-col>
         </b-row>
 
-        <b-row class="mb-2">
-            <b-col sm='12'>
+        <b-row class="mb-3">
+            <b-col cols="4">
                 <b-button-group>
-                    <b-button variant="danger" @click="$emit('set-open', 'random')">
-                       <p class="tiny">ROLL</p> <font-awesome-icon  class="icon" :icon="['fas', 'dice']" />
-                    </b-button>
                     <b-button variant="warning" @click="$emit('reset-active')">
                         <p class="tiny">RESET</p>
                         <font-awesome-icon :icon="['fas', 'retweet']" class="icon"/>
                     </b-button>
-                    <b-button :disabled="hidden" @click="$emit('disable-item', 'disable')">
+                    <b-button v-if="!hidden" :disabled="hidden" @click="$emit('disable-item', 'disable')">
                         <p class="tiny">HIDE</p>
                         <font-awesome-icon :icon="['fas', 'eye-slash']" class="icon"/>
                     </b-button>
-                    <b-button :disabled="!hidden" @click="$emit('disable-item', 'enable')">
+                    <b-button v-if="hidden" :disabled="!hidden" @click="$emit('disable-item', 'enable')">
                         <p class="tiny">SHOW</p>
-                        <font-awesome-icon :icon="['fas', 'eye-slash']" class="icon"/>
+                        <font-awesome-icon :icon="['fas', 'eye']" class="icon"/>
                     </b-button>
                 </b-button-group>
+            </b-col>
+            <b-col cols="8" class="d-flex justify-content-center align-items-center">
+                <b-form-input  min="0" :max="maxRange-1" v-model="selected" type="range"></b-form-input>
             </b-col>
         </b-row>
 
         <b-row class="mb-3" align-h="center">
             <b-col sm="12">
                 <b-button-group>
+                    <b-button variant="danger" @click="$emit('set-open', 'random')">
+                       <p class="tiny">RANDOM</p> <font-awesome-icon  class="icon" :icon="['fas', 'dice']" />
+                    </b-button>
                     <b-button :disabled="expandedMenu === 'move'" variant="primary" @click="$emit('set-open', 'move')">
                         <p class="tiny">MOVE</p><font-awesome-icon class="icon" :icon="['fas', 'hand-point-up']" />
                     </b-button>
@@ -160,6 +160,11 @@
             </b-col>
         </b-row>
 
+
+
+
+
+        <!-- COLOR -->
         <b-row v-if="expandedMenu === 'color'" class="mb-3">
             <b-col sm="12" class="d-flex flex-wrap justify-content-start">
                 <span v-for="color in colorList" :key="color">
@@ -175,7 +180,6 @@
                         </span>
  
                         <span class="fa-stack fa-2x" v-if="currentColor === color && currentColor !== null">
-                            <font-awesome-icon class="icon fa-stack-1x" style="color:tomato" :icon="['fas', 'sync']" />
                             <font-awesome-icon  class="icon fa-stack-2x" style="color:white" :icon="['fas', 'circle']" />
                             <font-awesome-icon  class="icon fa-stack-1x" style="color:black" :icon="['fas', 'eye']" />
                         </span>

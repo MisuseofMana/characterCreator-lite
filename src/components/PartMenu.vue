@@ -1,6 +1,8 @@
 <template>
-    <b-col xs="2" sm="3" md="12">
-        <b-button @click="$emit('current-open', type)" class="d-flex flex-column justify-content-center align-items-center menuButton" :disabled="isOpen"><p class="tiny">{{ type.replace('-', ' ').toUpperCase() }}</p></b-button>
+    <b-col cols="3" xs="12">
+        <b-button @click="$emit('current-open', type)" class="d-flex flex-column justify-content-center align-items-center menuButton" :disabled="isOpen">
+            <p class="tiny">{{ type.replace('-', ' ').toUpperCase() }}</p>
+        </b-button>
     </b-col>
 </template>
 
@@ -15,16 +17,3 @@
         },
     }
 </script>
-
-<style scoped>
-    .active {
-        color:rgb(255, 153, 0);
-    }
-
-    .menuButton {
-        width:100%;
-        height:auto;
-        margin:0 0 10px 0;
-        font-size:1vw;
-    }
-</style>

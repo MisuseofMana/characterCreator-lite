@@ -1,19 +1,16 @@
 <template>
 <b-row>
-  <b-col sm="12" md="2" lg="2">
+  <b-col md="2" class="mb-3">
     <b-row>
         <PartMenu @current-open="setActive($event)" type="body" :open.sync="active"> </PartMenu>
         <PartMenu @current-open="setActive($event)" type="eyes" :open.sync="active"> </PartMenu>
         <PartMenu @current-open="setActive($event)" type="brows" :open.sync="active"> </PartMenu>
-
         <PartMenu @current-open="setActive($event)" type="nose" :open.sync="active"> </PartMenu>
         <PartMenu @current-open="setActive($event)" type="mouth" :open.sync="active"> </PartMenu>
         <PartMenu @current-open="setActive($event)" type="ears" :open.sync="active"> </PartMenu>
-
         <PartMenu @current-open="setActive($event)" type="hair-front" :open.sync="active"> </PartMenu>
         <PartMenu @current-open="setActive($event)" type="hair-back" :open.sync="active"> </PartMenu>
         <PartMenu @current-open="setActive($event)" type="clothes" :open.sync="active"> </PartMenu>
-
         <PartMenu @current-open="setActive($event)" type="extras" :open.sync="active"> </PartMenu>
     </b-row>
   </b-col>
@@ -43,12 +40,14 @@
           :colorList="colorList"
         />
 
-  <b-col sm="12" md="5" lg="5">
-      <canvas id="canvas" width="500" height="500"></canvas>
-      <div id="download" @click="downloadImage()">
-        <p class="border">DOWNLOAD CHARACTER</p>
-      </div>
+  <b-col md="5">
+      <canvas id="canvas" class="mb-3" width="500" height="500"></canvas>
       <LoadingSpinner v-show="false" key="loader"/>
+      <b-button id="download" @click="downloadImage()">
+        <p class="tiny">
+          DOWNLOAD CHARACTER
+        </p> 
+      </b-button>
   </b-col>
   
   <canvas class="hidden" width="500" height="500" id="stageCanvas"></canvas>

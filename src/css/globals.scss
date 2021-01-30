@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+body {
+  touch-action: manipulation;
+}
+
+.fade-enter-active, .fade-leave-active {
+transition: opacity .2s;
+}
+
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+h1, h2, h3, h4, h5, p {
+  font-family: 'Press Start 2P', cursive;
+}
+
+@import "~bootstrap/scss/_functions.scss";
+@import "~bootstrap/scss/_variables.scss";
+@import "~bootstrap/scss/mixins/_breakpoints.scss";
+
+@include media-breakpoint-up(xs) {
+  #app {
+    background-color:#ccc !important;
+  }
+}
+
+@include media-breakpoint-up(sm) {
+  #app {
+    background-color:#aaa !important;
+  }
+}
+
+@include media-breakpoint-up(md) { 
+  #app {
+    background-color:#ccc !important;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  #app {
+    background-color:#aaa !important;
+  }
+}
+
+@include media-breakpoint-up(xl) {
+  #app {
+    background-color:#ccc !important;
+  }
+}

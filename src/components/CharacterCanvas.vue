@@ -18,29 +18,32 @@
     </b-row>
   </b-col>
 
-      
         <PartEditor
           @change-position="moveSprite($event)" 
           @new-pick="pickNewItem($event)"
           @random-item="randomItem()"
           @disable-item="disableItem($event)"
           @change-color="changeColor($event)"
-          @rotate-canvas="rotateCanvas($event)"
+          @rotate-clockwise="rotateClockwise($event)"
+          @rotate-anti-clockwise="rotateAntiClockwise($event)"
           @reset-rotation="resetRotation()"
           @scale-sprite="scaleSprite($event)"
           @move-layer="moveLayer($event)"
           @randomize-character="randomize()"
-          @reset-character="reset()"
+          @reset-character="reRoll()"
+          @reset-active="resetActive()"
+          @set-open="setOpen($event)"
           :hidden="selections[activeIndex].disable"
-          :type="active" 
+          :type="active"
+          :activeColor="selections[activeIndex].color"
           :maxRange="selections[activeIndex].max" 
           :key="`${active}editor`" 
           :which="selections[activeIndex].which"
+          :expandedMenu="expandedMenu"
+          :colorList="colorList"
         />
 
-
-
-  <b-col sm="12" md="6" lg="5">
+  <b-col sm="12" md="5" lg="5">
       <canvas id="canvas" width="500" height="500"></canvas>
       <div id="download" @click="downloadImage()">
         <p class="border">DOWNLOAD CHARACTER</p>
@@ -84,7 +87,7 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 6,
+          max: 7,
           disable: false,
           color: null
         },
@@ -123,7 +126,7 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max:12,
+          max:16,
           disable: false,
           color: null
         },
@@ -143,7 +146,7 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max:7,
+          max:9,
           disable: false,
           color: null
         },
@@ -163,7 +166,7 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 7,
+          max: 11,
           disable: false,
           color: null
         },
@@ -183,7 +186,7 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 7,
+          max: 11,
           disable: false,
           color: null
         },
@@ -203,7 +206,7 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 7,
+          max: 10,
           disable: false,
           color: null
         },
@@ -223,7 +226,7 @@ export default {
           rotation:0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 8,
+          max: 14,
           disable: false,
           color: null
         },
@@ -243,7 +246,7 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 7,
+          max: 8,
           disable: false,
           color: null
         },
@@ -267,22 +270,32 @@ export default {
           color: null
         },
       ],
-      defaultColor:'rgba(255,255,255,0.1)',
-      colors: {
-        none: null,
-        red: 'rgba(180, 0, 0, 0.3)',
-        yellow: 'rgba(235, 199, 0, 0.3)',
-        brown: 'rgba(119, 58, 23, 0.3)',
-        peach: 'rgb(248, 192, 160, 0.3)',
-        black: 'rgba(43, 38, 35, 0.3)',
-        darkbrown: 'rgba(85, 60, 46, 0.3)',
-        purple: 'rgba(151, 14, 105, 0.3)',
-        green: 'rgba(7, 170, 89, 0.3)',
-        blue: 'rgba(1, 94, 201, 0.3)',
-        orange: 'rgba(255, 105, 18, 0.3)'
-      },
-      colorList:['none','red', 'yellow', 'brown', 'peach', 'black', 'darkbrown', 'purple', 'green', 'blue', 'orange'],
+      defaultColor:'rgba(255,255,255,0.3)',
       imagesToLoad:0,
+      expandedMenu: 'color',
+      colorList: {
+        none:null,
+        pale:'rgb(248, 220, 180)',
+        peach:'rgb(248, 192, 160)',
+        tan:'rgb(220, 131, 100)',
+        brown:'rgb(119, 58, 23)',
+        darkBrown:'rgb(85, 60, 46)',
+        black:'rgb(30, 10, 30)',
+        pink:'rgb(255, 106, 106)',
+        red:'rgb(180, 0, 0)',
+        orange:'rgb(255, 105, 18)',
+        burntOrange:'rgb(200, 100, 0)',
+        yellow:'rgb(255, 225, 0)',
+        gold:'rgb(255, 190, 0)',
+        lightGreen:'rgb(120, 255, 200)',
+        blueGreen:'rgb(66, 245, 155)',
+        green:'rgb(50, 180, 100)',
+        blue:'rgb(0, 50, 255)',
+        darkBlue:'rgb(0, 0, 100)',
+        indigo:'rgb(50, 14, 100)',
+        purple:'rgb(151, 14, 105)',
+        neonPurple:'rgb(255, 0, 200)',
+    }
     }
   },
   computed: {
@@ -441,14 +454,18 @@ export default {
       this.selections[this.activeIndex].disable = false;
       this.init();
     },
-    rotateCanvas(e) {
-      if(e === 'clockwise'){
-        this.selections[this.activeIndex].rotation++;
-      }
-      if(e === 'counterclockwise'){
-        this.selections[this.activeIndex].rotation--;
-      }
+    rotateClockwise(e) {
+      console.log('clockwise', e)
+      this.selections[this.activeIndex].rotation += e
       if(this.selections[this.activeIndex].rotation >= 24) {
+        this.selections[this.activeIndex].rotation = 0;
+      }
+      this.init()
+    },
+    rotateAntiClockwise(e) {
+      console.log('anti-clockwise', e)
+      this.selections[this.activeIndex].rotation -= e
+      if(this.selections[this.activeIndex].rotation <= -24) {
         this.selections[this.activeIndex].rotation = 0;
       }
       this.init()
@@ -504,31 +521,59 @@ export default {
       this.init();
     },
     changeColor(e) {
-      this.selections[this.activeIndex].color = this.colors[e];
+      if(e === null){
+        this.selections[this.activeIndex].color = null;
+      }
+      else{
+      let colorString = e.replace('(','a(').replace(')',', 0.3)')
+      this.selections[this.activeIndex].color = colorString;
+      }
       this.init();
     },
     randomize() {
       for(let selection of this.selections){
+        let randomProperty = () => {
+            let keys = Object.keys(this.colorList);
+            return this.colorList[keys[ keys.length * Math.random() << 0]];
+        };
+        let getRandomColor = randomProperty();
+        if(getRandomColor !== null){
+          selection.color = getRandomColor.replace('(','a(').replace(')',', 0.3)');
+        }
+        else {
+          selection.color = null;
+        }
         let randomPick = Math.floor(Math.random() * selection.max);
         selection.which = randomPick;
-        let randomColor = Math.floor(Math.random() * this.colorList.length-1);
-        selection.color = this.colors[this.colorList[randomColor]];
         selection.disable = false;
-        this.init()
       }
+        this.init()
     },
-    reset() {
+    setOpen(e){
+      this.expandedMenu = e;
+    },
+    reRoll() {
       for(let selection of this.selections){
         let randomPick = Math.floor(Math.random() * selection.max);
+        selection.which = randomPick
         selection.left = 0;
         selection.top = 0;
-        selection.which = randomPick;
         selection.color = null;
         selection.rotation = 0;
         selection.scaleWidth = 500;
         selection.scaleHeight = 500;
     }
         this.init();
+    },
+    resetActive(){
+      this.selections[this.activeIndex].left = 0;
+      this.selections[this.activeIndex].top = 0;
+      this.selections[this.activeIndex].color = null;
+      this.selections[this.activeIndex].rotation = 0;
+      this.selections[this.activeIndex].scaleWidth = 500;
+      this.selections[this.activeIndex].scaleWidth = 500;
+      this.selections[this.activeIndex].disable = false;
+      this.init();
     },
     downloadImage(){
     let downloadLink = document.createElement('a');
@@ -541,7 +586,7 @@ export default {
     },
   },
   mounted(){
-    let random = Math.floor(Math.random() * 6) + 1
+    let random = Math.floor(Math.random() * 6)
     //add snipped image paths to appropriate arrays in the selections array
     for(let selection in this.selections){
       let current = this.selections[selection];

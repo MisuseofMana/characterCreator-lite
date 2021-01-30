@@ -9,7 +9,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 Vue.use(BootstrapVue)
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faDice, faHandPointUp, faPalette, faLayerGroup, faSlash, faCompressAlt, faCompressArrowsAlt, faExpandAlt, faExpandArrowsAlt, faUndo, faBan, faArrowUp, faArrowLeft, faArrowRight, faArrowDown, faCircle, faAngleDoubleDown, faAngleDoubleUp, faAngleDoubleLeft, faAngleDoubleRight, faSync } from '@fortawesome/free-solid-svg-icons'
+import { faDice, faEyeSlash, faCheck, faEye, faRetweet, faHandPointUp, faPalette, faLayerGroup, faSlash, faCompressAlt, faCompressArrowsAlt, faExpandAlt, faExpandArrowsAlt, faUndo, faBan, faArrowUp, faArrowLeft, faArrowRight, faArrowDown, faCircle, faAngleDoubleDown, faAngleDoubleUp, faAngleDoubleLeft, faAngleDoubleRight, faSync } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faArrowUp)
@@ -33,6 +33,10 @@ library.add(faExpandArrowsAlt)
 library.add(faLayerGroup)
 library.add(faHandPointUp)
 library.add(faPalette)
+library.add(faEyeSlash)
+library.add(faEye)
+library.add(faRetweet)
+library.add(faCheck)
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 

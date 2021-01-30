@@ -3,7 +3,7 @@
     <b-container>
       <b-row class="mb-4">
         <b-col>
-          <h1 class="h1-responsive">KINGLOYAL ADVENTURER GENERATOR</h1>
+          <h1 class="responsiveFont">KINGLOYAL ADVENTURER GENERATOR</h1>
           <p class="tiny">V.0.2. Created by Sean Yager, &copy; 2021, All rights reserved.</p>
         </b-col>
       </b-row>
@@ -37,11 +37,16 @@ export default {
 }
 
 .tiny {
-  font-size:10px;
+  font-size:.6vw;
   align-self: auto;
+  margin:5px;
 }
 
-::v-deep h1 {
-  font-size:3vw;
+.icon {
+  font-size:1vw;
+}
+
+h1.responsiveFont {
+  font-size:2vw;
 }
 </style>

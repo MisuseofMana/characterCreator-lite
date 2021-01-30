@@ -1,202 +1,212 @@
 <template>
-    <b-col md="4" lg="5" class="mb-4">
-        <b-row align-h="around">
-            <b-col sm="3">
-                <transition name="fade" mode="out-in">
-                    <p :key="type">{{ type.replace('-', ' ').toUpperCase() }}</p>
-                </transition>
+    <b-col md="5" lg="5" class="mb-4">
+        <b-row align-h="center">
+            <b-col sm="5">
+                <p class="tiny" :key="type">{{ type.replace('-', ' ').toUpperCase() }} #{{ selected }}</p>
             </b-col>
-            <b-col sm="6">
+            <b-col sm="7">
                 <b-form-input  min="0" :max="maxRange-1" v-model="selected" type="range"></b-form-input>
-            </b-col>
-            <b-col sm="2" class="ml-auto">
-                <p>#{{ selected }}</p>
             </b-col>
         </b-row>
 
-        <b-row class="mb-2" align-h="center">
-            <b-col sm='8' class="d-flex justify-content-center">
+        <b-row class="mb-2">
+            <b-col sm='12'>
                 <b-button-group>
-                    <b-button :disabled="hidden" @click="$emit('disable-item', 'disable')">HIDE {{ type.toUpperCase() }}</b-button>
-                    <b-button :disabled="!hidden" @click="$emit('disable-item', 'enable')">UNHIDE {{ type.toUpperCase() }}</b-button>
+                    <b-button variant="danger" @click="$emit('set-open', 'random')">
+                       <p class="tiny">ROLL</p> <font-awesome-icon  class="icon" :icon="['fas', 'dice']" />
+                    </b-button>
+                    <b-button variant="warning" @click="$emit('reset-active')">
+                        <p class="tiny">RESET</p>
+                        <font-awesome-icon :icon="['fas', 'retweet']" class="icon"/>
+                    </b-button>
+                    <b-button :disabled="hidden" @click="$emit('disable-item', 'disable')">
+                        <p class="tiny">HIDE</p>
+                        <font-awesome-icon :icon="['fas', 'eye-slash']" class="icon"/>
+                    </b-button>
+                    <b-button :disabled="!hidden" @click="$emit('disable-item', 'enable')">
+                        <p class="tiny">SHOW</p>
+                        <font-awesome-icon :icon="['fas', 'eye-slash']" class="icon"/>
+                    </b-button>
                 </b-button-group>
             </b-col>
         </b-row>
 
         <b-row class="mb-3" align-h="center">
-            <b-col sm="11">
+            <b-col sm="12">
                 <b-button-group>
-                    <b-button :disabled="expandedMenu === 'move'" @click="setActive('move')">
-                        <p class="tiny">MOVE</p><font-awesome-icon class="fa-2x" :icon="['fas', 'hand-point-up']" />
+                    <b-button :disabled="expandedMenu === 'move'" variant="primary" @click="$emit('set-open', 'move')">
+                        <p class="tiny">MOVE</p><font-awesome-icon class="icon" :icon="['fas', 'hand-point-up']" />
                     </b-button>
-                    <b-button :disabled="expandedMenu === 'color'" @click="setActive('color')">
-                        <p class="tiny">COLOR</p><font-awesome-icon class="fa-2x" :icon="['fas', 'palette']" />
+                    <b-button :disabled="expandedMenu === 'color'" variant="primary" @click="$emit('set-open', 'color')">
+                        <p class="tiny">COLOR</p><font-awesome-icon class="icon" :icon="['fas', 'palette']" />
                     </b-button>
-                    <b-button :disabled="expandedMenu === 'rotate'" @click="setActive('rotate')">
-                        <p class="tiny">ROTATE</p><font-awesome-icon class="fa-2x" :icon="['fas', 'undo']" />
+                    <b-button :disabled="expandedMenu === 'rotate'" variant="primary" @click="$emit('set-open', 'rotate')">
+                        <p class="tiny">ROTATE</p><font-awesome-icon class="icon" :icon="['fas', 'sync']" />
                     </b-button>
-                    <b-button :disabled="expandedMenu === 'scale'" @click="setActive('scale')">
-                        <p class="tiny">SCALE</p><font-awesome-icon class="fa-2x" :icon="['fas', 'expand-arrows-alt']" />
+                    <b-button :disabled="expandedMenu === 'scale'" variant="primary" @click="$emit('set-open', 'scale')">
+                        <p class="tiny">SCALE</p><font-awesome-icon class="icon" :icon="['fas', 'expand-arrows-alt']" />
                     </b-button>
-                    <b-button variant="warning" @click="$emit('random-item')">
-                       <p class="tiny">RANDOM</p> <font-awesome-icon  class="fa-2x" :icon="['fas', 'dice']" />
-                    </b-button>
-
                 </b-button-group>
             </b-col>
         </b-row>
 
-        <b-row v-if="expandedMenu === 'color'" class="mb-3" align-h="center">
-            <b-col sm="12" class="d-flex flex-wrap">
-                <div @click="colorize('none')" class="dotborder"><font-awesome-icon class="fa-rotate-45" style="color:tomato" :icon="['fas', 'sync']" /></div>
-                <div @click="colorize('red')" class="red dot"></div>
-                <div @click="colorize('yellow')" class="yellow dot"></div>
-                <div @click="colorize('peach')" class="peach dot"></div>
-                <div @click="colorize('orange')" class="orange dot"></div>
-                <div @click="colorize('blue')" class="blue dot"></div>
-                <div @click="colorize('green')" class="green dot"></div>
-                <div @click="colorize('purple')" class="purple dot"></div>
-                <div @click="colorize('brown')" class="brown dot"></div>
-                <div @click="colorize('darkbrown')" class="darkbrown dot"></div>
-                <div @click="colorize('black')" class="black dot"></div>
-            </b-col>
-        </b-row>
-
-        <span v-if="expandedMenu === 'move'">
-        <b-row align-h="center">
+        <b-row v-if="expandedMenu === 'move'">
+            <b-col sm="12">
             <b-button-group>
                 <b-button class="editorButton" @click="reposition(-5, 'xy-neg')">
-                    <font-awesome-icon class="fa-rotate-n45" :icon="['fas', 'angle-double-up']" />
+                    <font-awesome-icon class="fa-rotate-n45 icon" :icon="['fas', 'angle-double-up']" />
                 </b-button>
 
                 <b-button disabled variant="light" class="editorButton"></b-button>
                 <b-button disabled variant="light" class="editorButton"></b-button>
 
                 <b-button class="editorButton" @click="reposition(-5, 'y')">
-                    <font-awesome-icon :icon="['fas', 'angle-double-up']" />
+                    <font-awesome-icon class="icon" :icon="['fas', 'angle-double-up']" />
                 </b-button>
                 
                 <b-button disabled variant="light" class="editorButton"></b-button>
                 <b-button disabled variant="light" class="editorButton"></b-button>
                 
                 <b-button class="editorButton" @click="reposition(-5, 'xy-pos')">
-                    <font-awesome-icon class="fa-rotate-45" :icon="['fas', 'angle-double-up']" />
+                    <font-awesome-icon class="fa-rotate-45 icon" :icon="['fas', 'angle-double-up']" />
                 </b-button>
             </b-button-group>
+
+            <b-button-group>
+                <b-button disabled variant="light" class="editorButton"></b-button>
+
+                <b-button class="editorButton" @click="reposition(-1, 'xy-neg')">
+                    <font-awesome-icon class="fa-rotate-n45 icon" :icon="['fas', 'arrow-up']" />
+                </b-button>
+
+                <b-button disabled variant="light" class="editorButton"></b-button>
+
+                <b-button class="editorButton" @click="reposition(-1, 'y')">
+                    <font-awesome-icon class="icon" :icon="['fas', 'arrow-up']" />
+                </b-button>
+
+                <b-button disabled variant="light" class="editorButton"></b-button>
+
+                <b-button class="editorButton" @click="reposition(-1, 'xy-pos')">
+                    <font-awesome-icon class="fa-rotate-45 icon" :icon="['fas', 'arrow-up']" />
+                </b-button>
+
+                <b-button disabled variant="light" class="editorButton"></b-button>
+
+            </b-button-group>
+
+            <b-button-group>
+                <b-button class="editorButton" @click="reposition(-5, 'x')">
+                    <font-awesome-icon class="icon" :icon="['fas', 'angle-double-left']" />
+                </b-button>
+
+                <b-button disabled variant="light" class="editorButton"></b-button>
+
+                <b-button class="editorButton" @click="reposition(-1, 'x')">
+                    <font-awesome-icon class="icon" :icon="['fas', 'arrow-left']" />
+                </b-button>
+
+                <b-button variant="danger" class="editorButton" @click="reposition(null, 'reset')">
+
+                    <font-awesome-icon class="fa-rotate-45" :icon="['fas', 'sync']" />
+                </b-button>
+
+                <b-button class="editorButton" @click="reposition(1, 'x')">
+                    <font-awesome-icon :icon="['fas', 'arrow-right']" />
+                </b-button>
+
+                <b-button disabled variant="light" class="editorButton"></b-button>
+
+                <b-button class="editorButton" @click="reposition(5, 'x')">
+                    <font-awesome-icon class="icon" :icon="['fas', 'angle-double-right']" />
+                </b-button>
+            </b-button-group>
+        
+            <b-button-group>
+                <b-button disabled variant="light" class="editorButton"></b-button>
+                    <b-button class="editorButton" @click="reposition(1, 'xy-pos')">
+                    <font-awesome-icon class="fa-rotate-45 icon" :icon="['fas', 'arrow-down']" />
+                </b-button>
+                <b-button disabled variant="light" class="editorButton"></b-button>
+                <b-button class="editorButton" @click="reposition(1, 'y')">
+                    <font-awesome-icon class="icon" :icon="['fas', 'arrow-down']" />
+                </b-button>
+                <b-button disabled variant="light" class="editorButton"></b-button>
+                <b-button class="editorButton" @click="reposition(1, 'xy-neg')">
+                    <font-awesome-icon class="fa-rotate-n45 icon" :icon="['fas', 'arrow-down']" />
+                </b-button>
+                <b-button disabled variant="light" class="editorButton"></b-button>
+            </b-button-group>
+        
+            <b-button-group>
+                <b-button class="editorButton" @click="reposition(5, 'xy-pos')">
+                    <font-awesome-icon class="fa-rotate-45 icon" :icon="['fas', 'angle-double-down']" />
+                </b-button>
+
+                <b-button disabled variant="light" class="editorButton"></b-button>
+                <b-button disabled variant="light" class="editorButton"></b-button>
+                
+                <b-button class="editorButton" @click="reposition(5, 'y')">
+                    <font-awesome-icon class="icon" :icon="['fas', 'angle-double-down']" />
+                </b-button>
+                
+                <b-button disabled variant="light" class="editorButton"></b-button>
+                <b-button disabled variant="light" class="editorButton"></b-button>
+                
+                <b-button class="editorButton" @click="reposition(5, 'xy-neg')">
+                    <font-awesome-icon class="fa-rotate-n45 icon" :icon="['fas', 'angle-double-down']" />
+                </b-button>
+            </b-button-group>
+            </b-col>
         </b-row>
-            
-            <b-row align-h="center">
-                <b-button-group>
-                    <b-button disabled variant="light" class="editorButton"></b-button>
 
-                    <b-button class="editorButton" @click="reposition(-1, 'xy-neg')">
-                        <font-awesome-icon class="fa-rotate-n45" :icon="['fas', 'arrow-up']" />
-                    </b-button>
+        <b-row v-if="expandedMenu === 'color'" class="mb-3">
+            <b-col sm="12" class="d-flex flex-wrap justify-content-start">
+                <span v-for="color in colorList" :key="color">
+                    <div @click="changeColor(color)" :style="{backgroundColor:color}" :class="{'dotborder':color === null || color === 'rgb(255, 255, 255)' }" class="dot">
+                        <span v-if="color===null && currentColor !== null">
+                            <font-awesome-icon class="icon" style="color:tomato" :icon="['fas', 'sync']" />
+                        </span>
 
-                    <b-button disabled variant="light" class="editorButton"></b-button>
+                        <span class="fa-stack fa-2x" v-if="color===null && currentColor === null">
+                            <font-awesome-icon class="icon fa-stack-1x" style="color:tomato" :icon="['fas', 'sync']" />
+                            <font-awesome-icon  class="icon fa-stack-2x" style="color:white" :icon="['fas', 'circle']" />
+                            <font-awesome-icon  class="icon fa-stack-1x" style="color:black" :icon="['fas', 'eye']" />
+                        </span>
+ 
+                        <span class="fa-stack fa-2x" v-if="currentColor === color && currentColor !== null">
+                            <font-awesome-icon class="icon fa-stack-1x" style="color:tomato" :icon="['fas', 'sync']" />
+                            <font-awesome-icon  class="icon fa-stack-2x" style="color:white" :icon="['fas', 'circle']" />
+                            <font-awesome-icon  class="icon fa-stack-1x" style="color:black" :icon="['fas', 'eye']" />
+                        </span>
+                    </div>
+                </span>
+            </b-col>
+        </b-row>
 
-                    <b-button class="editorButton" @click="reposition(-1, 'y')">
-                        <font-awesome-icon :icon="['fas', 'arrow-up']" />
-                    </b-button>
 
-                    <b-button disabled variant="light" class="editorButton"></b-button>
 
-                    <b-button class="editorButton" @click="reposition(-1, 'xy-pos')">
-                        <font-awesome-icon class="fa-rotate-45" :icon="['fas', 'arrow-up']" />
-                    </b-button>
 
-                    <b-button disabled variant="light" class="editorButton"></b-button>
 
-                </b-button-group>
-            </b-row>
-            
-            <b-row align-h="center">
-                <b-button-group>
-                    <b-button class="editorButton" @click="reposition(-5, 'x')">
-                        <font-awesome-icon :icon="['fas', 'angle-double-left']" />
-                    </b-button>
 
-                    <b-button disabled variant="light" class="editorButton"></b-button>
-
-                    <b-button class="editorButton" @click="reposition(-1, 'x')">
-                        <font-awesome-icon :icon="['fas', 'arrow-left']" />
-                    </b-button>
-
-                    <b-button variant="danger" class="editorButton" @click="reposition(null, 'reset')">
-
-                        <font-awesome-icon class="fa-rotate-45" :icon="['fas', 'sync']" />
-                    </b-button>
-
-                    <b-button class="editorButton" @click="reposition(1, 'x')">
-                        <font-awesome-icon :icon="['fas', 'arrow-right']" />
-                    </b-button>
-
-                    <b-button disabled variant="light" class="editorButton"></b-button>
-
-                    <b-button class="editorButton" @click="reposition(5, 'x')">
-                        <font-awesome-icon :icon="['fas', 'angle-double-right']" />
-                    </b-button>
-                </b-button-group>
-            </b-row>
-            
-            <b-row align-h="center">
-                <b-button-group>
-                    <b-button disabled variant="light" class="editorButton"></b-button>
-                     <b-button class="editorButton" @click="reposition(1, 'xy-pos')">
-                        <font-awesome-icon class="fa-rotate-45" :icon="['fas', 'arrow-down']" />
-                    </b-button>
-                    <b-button disabled variant="light" class="editorButton"></b-button>
-                    <b-button class="editorButton" @click="reposition(1, 'y')">
-                        <font-awesome-icon :icon="['fas', 'arrow-down']" />
-                    </b-button>
-                    <b-button disabled variant="light" class="editorButton"></b-button>
-                    <b-button class="editorButton" @click="reposition(1, 'xy-neg')">
-                        <font-awesome-icon class="fa-rotate-n45" :icon="['fas', 'arrow-down']" />
-                    </b-button>
-                    <b-button disabled variant="light" class="editorButton"></b-button>
-                </b-button-group>
-            </b-row>
-            
-            <b-row align-h="center" class="mb-4">
-                <b-button-group>
-                    <b-button class="editorButton" @click="reposition(5, 'xy-pos')">
-                        <font-awesome-icon class="fa-rotate-45" :icon="['fas', 'angle-double-down']" />
-                    </b-button>
-
-                    <b-button disabled variant="light" class="editorButton"></b-button>
-                    <b-button disabled variant="light" class="editorButton"></b-button>
-                    
-                    <b-button class="editorButton" @click="reposition(5, 'y')">
-                        <font-awesome-icon :icon="['fas', 'angle-double-down']" />
-                    </b-button>
-                    
-                    <b-button disabled variant="light" class="editorButton"></b-button>
-                    <b-button disabled variant="light" class="editorButton"></b-button>
-                    
-                    <b-button class="editorButton" @click="reposition(5, 'xy-neg')">
-                        <font-awesome-icon class="fa-rotate-n45" :icon="['fas', 'angle-double-down']" />
-                    </b-button>
-                </b-button-group>
-            </b-row>
-        </span>
-
+        <!-- ROATATE -->
         <b-row class="mb-2" align-h="center" v-if="expandedMenu === 'rotate'">
             <b-col sm="12" class="d-flex justify-content-center">
                 <b-button-group>
                     <b-button variant="danger" class="editorButton" @click="$emit('reset-rotation')">
-                        <font-awesome-icon :icon="['fas', 'ban']" />
+                        <font-awesome-icon class="icon" :icon="['fas', 'ban']" />
                     </b-button>
-                    <b-button class="editorButton" @click="$emit('rotate-canvas', 'clockwise')">
-                        <font-awesome-icon class="fa-flip-horizontal" :icon="['fas', 'undo']" />
+                    <b-button class="editorButton" @click="$emit('rotate-clockwise', .1)">
+                        <font-awesome-icon class="fa-flip-horizontal icon" :icon="['fas', 'undo']" />
                     </b-button>
-                    <b-button class="editorButton" @click="$emit('rotate-canvas', 'counterclockwise')">
-                        <font-awesome-icon :icon="['fas', 'undo']" />
+                    <b-button class="editorButton" @click="$emit('rotate-anti-clockwise', .1)">
+                        <font-awesome-icon class="icon" :icon="['fas', 'undo']" />
                     </b-button>
-                    <b-button class="editorButton" variant="dark" @click="$emit('rotate-canvas', 'clockwise')">
-                        <font-awesome-icon class="fa-flip-horizontal" :icon="['fas', 'undo']" />
+                    <b-button class="editorButton" variant="dark" @click="$emit('rotate-clockwise', .5)">
+                        <font-awesome-icon class="fa-flip-horizontal icon" :icon="['fas', 'undo']" />
                     </b-button>
-                    <b-button class="editorButton" variant="dark" @click="$emit('rotate-canvas', 'counterclockwise')">
-                        <font-awesome-icon :icon="['fas', 'undo']" />
+                    <b-button class="editorButton" variant="dark" @click="$emit('rotate-anti-clockwise', .5)">
+                        <font-awesome-icon class="icon" :icon="['fas', 'undo']" />
                     </b-button>
                 </b-button-group>
             </b-col>
@@ -206,49 +216,52 @@
             <b-col sm="12" class="d-flex justify-content-center">
                 <b-button-group>
                     <b-button variant="danger"  class="editorButton" @click="$emit('scale-sprite', 'reset')">
-                        <font-awesome-icon :icon="['fas', 'ban']" />
+                        <font-awesome-icon class="icon" :icon="['fas', 'ban']" />
                     </b-button>
                     <b-button class="editorButton" @click="$emit('scale-sprite', 'tall')">
-                        <font-awesome-icon class="fa-rotate-n45" :icon="['fas', 'expand-alt']" />
+                        <font-awesome-icon class="fa-rotate-n45 icon" :icon="['fas', 'expand-alt']" />
                     </b-button>
                     <b-button  class="editorButton" @click="$emit('scale-sprite', 'short')">
-                        <font-awesome-icon class="fa-rotate-n45" :icon="['fas', 'compress-alt']" />
+                        <font-awesome-icon class="fa-rotate-n45 icon" :icon="['fas', 'compress-alt']" />
                     </b-button>
                     <b-button class="editorButton" @click="$emit('scale-sprite', 'wide')">
-                        <font-awesome-icon class="fa-rotate-45" :icon="['fas', 'expand-alt']" />
+                        <font-awesome-icon class="fa-rotate-45 icon" :icon="['fas', 'expand-alt']" />
                     </b-button>
                     <b-button  class="editorButton" @click="$emit('scale-sprite', 'thin')">
-                        <font-awesome-icon class="fa-rotate-45" :icon="['fas', 'compress-alt']" />
+                        <font-awesome-icon class="fa-rotate-45 icon" :icon="['fas', 'compress-alt']" />
                     </b-button>
                     <b-button class="editorButton" @click="$emit('scale-sprite', 'up')">
-                        <font-awesome-icon :icon="['fas', 'expand-arrows-alt']" />
+                        <font-awesome-icon class="icon" :icon="['fas', 'expand-arrows-alt']" />
                     </b-button>
                     <b-button  class="editorButton" @click="$emit('scale-sprite', 'down')">
-                        <font-awesome-icon :icon="['fas', 'compress-arrows-alt']" />
-                    </b-button>
-                    
-                </b-button-group>
-            </b-col>
-        </b-row>
-
-        <b-row>
-            <b-col sm="12">
-                <p class="tiny">WARNING: The buttons below will randomize your character, use with caution. Randomization is not undo-able.</p>
-            </b-col>
-        </b-row>
-
-        <b-row>
-            <b-col sm="12" class="d-flex justify-content-center">
-                <b-button-group>
-                    <b-button class="editorButton" variant="danger" @click="$emit('randomize-character')">
-                        <font-awesome-icon :icon="['fas', 'dice']" />
-                    </b-button>
-                    <b-button class="editorButton" variant="danger" @click="$emit('reset-character')">
-                        <font-awesome-icon :icon="['fas', 'sync']" />
+                        <font-awesome-icon class="icon" :icon="['fas', 'compress-arrows-alt']" />
                     </b-button>
                 </b-button-group>
             </b-col>
         </b-row>
+
+        <span v-if="expandedMenu === 'random'">
+            <b-row class="mb-3">
+                <b-col sm="12">
+                    <p class="tiny">WARNING: The buttons below will randomize your character, use with caution. Randomization is not undo-able.</p>
+                </b-col>
+            </b-row>
+
+            <b-row align-h="around">
+                <b-col sm="6" class="d-flex justify-content-center">
+                    <b-button variant="danger" size="lg"  class="mr-4" @click="$emit('randomize-character')">
+                        <p class="tiny">JUST MESS MY WHOLE THING UP.</p>
+                        <font-awesome-icon class="icon" :icon="['fas', 'dice']" />
+                    </b-button>
+                </b-col>
+                <b-col sm="6">
+                    <b-button variant="danger" size="lg" @click="$emit('reset-character')">
+                        <p class="tiny">MESS ME UP, BUT KEEP THINGS NEAT.</p>
+                        <font-awesome-icon class="icon" :icon="['fas', 'sync']" />
+                    </b-button>
+                </b-col>
+            </b-row>
+        </span>
 
             <!-- <div class="line"></div>
 
@@ -275,12 +288,7 @@
 
 <script>
     export default {
-        props:['type', 'maxRange', 'which', 'hidden'],
-        data() {
-            return {
-                expandedMenu: 'move'
-            }
-        },
+        props:['type', 'maxRange', 'which', 'hidden', 'expandedMenu', 'colorList', 'activeColor'],
         computed: {
             selected: {
                 get: function() {
@@ -290,28 +298,29 @@
                     this.$emit('new-pick', newValue);
                     return newValue
                 }
+            },
+            currentColor: function() {
+                if(this.activeColor === null){
+                    return null
+                }
+                let formattedColor = this.activeColor.replace('rgba', 'rgb').replace(', 0.3', '');
+                return formattedColor;
             }
         },
         methods: {
             reposition(value, direction) {
                 this.$emit('change-position', {value, direction})
             },
-            colorize(color) {
-                this.$emit('change-color', color)
-            },
             randomizeCharacter() {
                 this.$emit('randomize-character');
             },
-            resetCharacter() {
-                this.$emit('reset-character');
+            changeColor(e){
+                this.$emit('change-color', e);
             },
             setActive(which) {
                 this.expandedMenu = which;
             }
         },
-        mounted() {
-            this.$emit('run-init');
-        }
     }
 </script>
 
@@ -322,6 +331,9 @@
     margin:10px;
     cursor:pointer;
     border-radius:999px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .dotborder {
@@ -329,52 +341,11 @@
     height:50px;
     border:solid 1px black;
     margin:10px;
-    font-size:8px;
     display:flex;
     justify-content: center;
     align-items: center;
     cursor:pointer;
     border-radius:999px;
-}
-
-.red {
-    background:rgb(180, 0, 0);
-}
-
-.yellow {
-    background:rgb(235, 199, 0);
-}
-
-.brown {
-    background:rgb(119, 58, 23);
-}
-
-.peach {
-    background:rgb(248, 192, 160);
-}
-
-.black {
-    background:rgb(43, 38, 35);
-}
-
-.darkbrown {
-    background:rgb(85, 60, 46);    
-}
-
-.purple {
-    background:rgb(151, 14, 105);    
-}
-
-.green {
-    background:rgb(7, 170, 89);    
-}
-
-.blue {
-    background:rgb(1, 94, 201);    
-}
-
-.orange {
-    background:rgb(255, 105, 18);    
 }
 
 .fa-rotate-45 {
@@ -405,8 +376,8 @@
 }
 
 .editorButton {
-    width:45px;
-    height:45px;
-    margin:2px 5px;
+    width:3.2vw;
+    height:3.2vw;
+    margin:1px;
 }
 </style>

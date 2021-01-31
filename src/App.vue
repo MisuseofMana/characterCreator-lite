@@ -35,6 +35,9 @@ export default {
 .dot{
     cursor:pointer;
     border-radius:999px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .dotborder {
@@ -46,64 +49,173 @@ export default {
 }
 
 @include media-breakpoint-up(xs) {
-#app {
-  margin-top:5px;
-}
+  .editorButton {
+    width:10vw;
+    height:10vw;
+    margin:1px;
+  }
 
-h1.responsiveFont {
-  font-size:clamp(5px, 4vw, 20px);
-}
-.tiny {
-  font-size:clamp(3px, 1.7vw, 15px);
-  margin:0;
-}
+  h1.responsiveFont {
+    font-size:clamp(5px, 4vw, 20px);
+    margin:10px 0;
+  }
+  .tiny {
+    font-size:clamp(3px, 2vw, 12px);
+    margin:0;
+  }
 
-.icon {
-  font-size:clamp(10px, 2vw, 15px);
-}
+  .icon {
+    font-size:clamp(5px, 9vw, 18px);
+    margin-top:5px;
+  }
 
  .menuButton {
     width:100%;
-    height:35px;
+    height:50px;
     margin:5px 0;
   }
 
   .dot {
-    width:30px; 
-    height:30px;
+    width:60px; 
+    height:60px;
     margin:5px;
-    cursor:pointer;
-    border-radius:999px;
-    display:flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.dotborder {
-    width:30px;
-    height:30px;
-    border:solid 1px black;
-    margin:5px;
-    display:flex;
-    justify-content: center;
-    align-items: center;
-    cursor:pointer;
-    border-radius:999px;
-}
+  }
 }
 
 @include media-breakpoint-up(sm) {
+  .editorButton {
+    width:8vw;
+    height:8vw;
+    margin:1px;
+  }
 
+  h1.responsiveFont {
+    font-size:clamp(5px, 4vw, 20px);
+    margin:10px 0;
+  }
+
+  .tiny {
+    font-size:clamp(3px, 2vw, 12px);
+    margin:0;
+  }
+
+  .icon {
+    font-size:clamp(5px, 3vw, 25px);
+  }
+
+ .menuButton {
+    width:100%;
+    height:40px;
+    margin:5px 0;
+  }
+
+  .dot {
+    width:60px; 
+    height:60px;
+    margin:5px;
+  }
 }
-@include media-breakpoint-up(md) { 
 
+@include media-breakpoint-up(md) {
+  .editorButton {
+    width:9vw;
+    height:9vw;
+    margin:1px;
+  }
+
+  h1.responsiveFont {
+    font-size:clamp(5px, 6vw, 30px);
+    margin:10px 0;
+  }
+
+  .tiny {
+    font-size:clamp(3px, 3vw, 15px);
+    margin:0;
+  }
+
+  .icon {
+    font-size:clamp(5px, 2.5vw, 25px);
+  }
+
+ .menuButton {
+    width:100%;
+    height:50px;
+    margin:5px 0;
+  }
+
+  .dot {
+    width:50px; 
+    height:50px;
+    margin:5px;
+  }
 }
 @include media-breakpoint-up(lg) {
+  .editorButton {
+    width:8vw;
+    height:8vw;
+    margin:1px;
+  }
 
+  h1.responsiveFont {
+    font-size:clamp(5px, 6vw, 30px);
+    margin:10px 0;
+  }
+
+  .tiny {
+    font-size:clamp(3px, 2vw, 20px);
+    margin:0;
+  }
+
+  .icon {
+    font-size:clamp(10px, 5vw, 30px);
+  }
+
+ .menuButton {
+    width:100%;
+    height:70px;
+    margin:5px 0;
+  }
+
+  .dot {
+    width:70px; 
+    height:70px;
+    margin:5px;
+  }
 }
 @include media-breakpoint-up(xl) {
+  .editorButton {
+    width:3vw;
+    height:3vw;
+    margin:1px;
+  }
 
+  h1.responsiveFont {
+    font-size:clamp(5px, 6vw, 30px);
+    margin:10px 0;
+  }
+
+  .tiny {
+    font-size:clamp(3px, 2vw, 12px);
+    margin:0;
+  }
+
+  .icon {
+    font-size:clamp(10px, 3vw, 20px);
+  }
+
+ .menuButton {
+    width:100%;
+    height:60px;
+    margin:5px 0;
+  }
+
+  .dot {
+    width:50px; 
+    height:50px;
+    margin:5px;
+  }
 }
+
 
 // Example usage:
 

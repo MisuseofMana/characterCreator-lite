@@ -1,6 +1,6 @@
 <template>
 <b-row>
-  <b-col md="2" class="mb-3">
+  <b-col cols="12" xl="2" class="mb-3">
     <b-row>
         <PartMenu @current-open="setActive($event)" type="body" :open.sync="active"> </PartMenu>
         <PartMenu @current-open="setActive($event)" type="eyes" :open.sync="active"> </PartMenu>
@@ -40,16 +40,17 @@
           :colorList="colorList"
         />
 
-  <b-col cols="12">
+  <b-col cols="12" xl="5" class="mb-4 d-flex flex-row justify-content-center">
     <b-row align-h="center">
-    <b-col cols="9" sm="10">
+    <b-col cols="12" sm="11" md="10" class="d-flex flex-column justify-content-center ">
       <canvas id="canvas" class="mb-3" width="500" height="500"></canvas>
       <LoadingSpinner v-show="false" key="loader"/>
-      <b-button id="download" @click="downloadImage()">
-        <p class="tiny">
+      <b-button id="download" class="mb-3" @click="downloadImage()">
+        <h1 class="responsiveFont">
           DOWNLOAD CHARACTER
-        </p> 
+        </h1> 
       </b-button>
+      <p class="tiny">Characters created using this generator are bound by the Creative Commons Attribution Share-Alike license. By downloading, using, distributing, or manipulating the characters here you are agreeing to the terms <a href="https://creativecommons.org/licenses/by-sa/3.0/us/">lain out here.</a>  </p>
     </b-col>
     </b-row>
   </b-col>
@@ -275,7 +276,7 @@ export default {
       ],
       defaultColor:'rgba(255,255,255,0.3)',
       imagesToLoad:0,
-      expandedMenu: 'color',
+      expandedMenu: 'choose',
       colorList: {
         none:null,
         pale:'rgb(248, 220, 180)',
@@ -420,11 +421,6 @@ export default {
         this.selections[this.activeIndex].left += e.value;
         this.selections[this.activeIndex].top -= e.value
       }
-
-      if(e.direction === 'reset') {
-        this.selections[this.activeIndex].left = 0;
-        this.selections[this.activeIndex].top = 0;
-      }
         this.init();
     },
     scaleSprite(e) {
@@ -474,7 +470,7 @@ export default {
       this.init()
     },
     resetRotation(){
-       this.selections[this.activeIndex].rotation = 0;
+
        this.init();
     },
     disableItem(e) {
@@ -574,7 +570,7 @@ export default {
       this.selections[this.activeIndex].color = null;
       this.selections[this.activeIndex].rotation = 0;
       this.selections[this.activeIndex].scaleWidth = 500;
-      this.selections[this.activeIndex].scaleWidth = 500;
+      this.selections[this.activeIndex].scaleHeight = 500;
       this.selections[this.activeIndex].disable = false;
       this.init();
     },
@@ -618,27 +614,6 @@ export default {
     display:none;
   }
 
-  #download {
-    text-align:center;
-    transition: all .1s;
-  }
-
-  #download p {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-
-  #download:hover {
-    background:rgb(136, 255, 215);
-    transform:scale(1.05);
-    transition: all .1s;
-    cursor:pointer;
-  }
-
   .border {
       border:solid 1px black;
       padding:10px;
@@ -647,6 +622,7 @@ export default {
   #canvas, #stageCanvas {
     border: solid 2px black;
     width: 100%;
+    max-width:500px;
     height: auto;
   }
 </style>

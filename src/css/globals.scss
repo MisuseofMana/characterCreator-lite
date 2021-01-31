@@ -15,37 +15,3 @@ transition: opacity .2s;
 h1, h2, h3, h4, h5, p {
   font-family: 'Press Start 2P', cursive;
 }
-
-@import "~bootstrap/scss/_functions.scss";
-@import "~bootstrap/scss/_variables.scss";
-@import "~bootstrap/scss/mixins/_breakpoints.scss";
-
-@include media-breakpoint-up(xs) {
-  #app {
-    background-color:#ccc !important;
-  }
-}
-
-@include media-breakpoint-up(sm) {
-  #app {
-    background-color:#aaa !important;
-  }
-}
-
-@include media-breakpoint-up(md) { 
-  #app {
-    background-color:#ccc !important;
-  }
-}
-
-@include media-breakpoint-up(lg) {
-  #app {
-    background-color:#aaa !important;
-  }
-}
-
-@include media-breakpoint-up(xl) {
-  #app {
-    background-color:#ccc !important;
-  }
-}

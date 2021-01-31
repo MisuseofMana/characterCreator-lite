@@ -9,7 +9,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 Vue.use(BootstrapVue)
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faDice, faEyeSlash, faCheck, faEye, faRetweet, faHandPointUp, faPalette, faLayerGroup, faSlash, faCompressAlt, faCompressArrowsAlt, faExpandAlt, faExpandArrowsAlt, faUndo, faBan, faArrowUp, faArrowLeft, faArrowRight, faArrowDown, faCircle, faAngleDoubleDown, faAngleDoubleUp, faAngleDoubleLeft, faAngleDoubleRight, faSync } from '@fortawesome/free-solid-svg-icons'
+import { faDice, faEyeSlash, faUserEdit, faCheck, faEye, faRetweet, faHandPointUp, faPalette, faLayerGroup, faSlash, faCompressAlt, faCompressArrowsAlt, faExpandAlt, faExpandArrowsAlt, faUndo, faBan, faArrowUp, faArrowLeft, faArrowRight, faArrowDown, faCircle, faAngleDoubleDown, faAngleDoubleUp, faAngleDoubleLeft, faAngleDoubleRight, faSync } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faArrowUp)
@@ -37,6 +37,7 @@ library.add(faEyeSlash)
 library.add(faEye)
 library.add(faRetweet)
 library.add(faCheck)
+library.add(faUserEdit)
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 

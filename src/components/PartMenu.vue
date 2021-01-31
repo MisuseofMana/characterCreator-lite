@@ -1,6 +1,6 @@
 <template>
-    <b-col cols="3" xs="12">
-        <b-button @click="$emit('current-open', type)" class="d-flex flex-column justify-content-center align-items-center menuButton" :disabled="isOpen">
+    <b-col cols="3" sm="4" lg="6" xl="12">
+        <b-button variant="primary" @click="$emit('current-open', type)" class="d-flex flex-column justify-content-center align-items-center menuButton" :disabled="isOpen">
             <p class="tiny">{{ type.replace('-', ' ').toUpperCase() }}</p>
         </b-button>
     </b-col>

@@ -6,7 +6,7 @@
             </b-col>
         </b-row>
 
-        <b-row class="mb-3">
+        <b-row class="mb-3" >
             <b-col cols="4">
                 <b-button-group>
                     <b-button variant="warning" @click="$emit('reset-active')">

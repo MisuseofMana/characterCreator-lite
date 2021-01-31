@@ -32,6 +32,19 @@ export default {
 @import "~bootstrap/scss/_variables.scss";
 @import "~bootstrap/scss/mixins/_breakpoints.scss";
 
+.dot{
+    cursor:pointer;
+    border-radius:999px;
+}
+
+.dotborder {
+    border:solid 1px black;
+    background:white;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
 @include media-breakpoint-up(xs) {
 #app {
   margin-top:5px;
@@ -54,6 +67,29 @@ h1.responsiveFont {
     height:35px;
     margin:5px 0;
   }
+
+  .dot {
+    width:30px; 
+    height:30px;
+    margin:5px;
+    cursor:pointer;
+    border-radius:999px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dotborder {
+    width:30px;
+    height:30px;
+    border:solid 1px black;
+    margin:5px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    cursor:pointer;
+    border-radius:999px;
+}
 }
 
 @include media-breakpoint-up(sm) {

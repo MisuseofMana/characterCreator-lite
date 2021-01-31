@@ -40,7 +40,9 @@
           :colorList="colorList"
         />
 
-  <b-col md="5">
+  <b-col cols="12">
+    <b-row align-h="center">
+    <b-col cols="9" sm="10">
       <canvas id="canvas" class="mb-3" width="500" height="500"></canvas>
       <LoadingSpinner v-show="false" key="loader"/>
       <b-button id="download" @click="downloadImage()">
@@ -48,6 +50,8 @@
           DOWNLOAD CHARACTER
         </p> 
       </b-button>
+    </b-col>
+    </b-row>
   </b-col>
   
   <canvas class="hidden" width="500" height="500" id="stageCanvas"></canvas>

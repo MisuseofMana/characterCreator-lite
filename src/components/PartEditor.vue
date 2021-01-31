@@ -1,5 +1,5 @@
 <template>
-    <b-col md="5" class="mb-3">
+    <b-col sm="12" md="5" class="mb-3">
         <b-row>
             <b-col cols="12" class="d-flex justify-content-start">
                 <h1 class="responsiveFont" :key="type">{{ type.replace('-', ' ').toUpperCase() }} #{{ selected }}</h1>
@@ -29,7 +29,7 @@
         </b-row>
 
         <b-row class="mb-3" align-h="center">
-            <b-col sm="12">
+            <b-col cols="11">
                 <b-button-group>
                     <b-button variant="danger" @click="$emit('set-open', 'random')">
                        <p class="tiny">RANDOM</p> <font-awesome-icon  class="icon" :icon="['fas', 'dice']" />
@@ -329,28 +329,6 @@
 </script>
 
 <style scoped>
-.dot {
-    width:50px;
-    height:50px;
-    margin:10px;
-    cursor:pointer;
-    border-radius:999px;
-    display:flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.dotborder {
-    width:50px;
-    height:50px;
-    border:solid 1px black;
-    margin:10px;
-    display:flex;
-    justify-content: center;
-    align-items: center;
-    cursor:pointer;
-    border-radius:999px;
-}
 
 .fa-rotate-45 {
     -webkit-transform: rotate(45deg);

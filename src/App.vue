@@ -66,7 +66,6 @@ export default {
 
   .icon {
     font-size:clamp(5px, 9vw, 18px);
-    margin-top:5px;
   }
 
  .menuButton {

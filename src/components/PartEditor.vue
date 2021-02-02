@@ -26,9 +26,14 @@
         <!-- RESET -->
         <b-row v-if="expandedMenu === 'reset'" align-h="center" class="mb-3">
             <b-col cols="11" class="d-flex flex-column justify-content-center align-items-center">
-                <p class="tiny mb-2">WARNING: The button below will reset the option you're currently editing. Be careful! </p>
-                <b-button variant="danger" @click="$emit('reset-active')">
+                <p class="tiny mb-4">WARNING: The buttons below will reset colors and positions of your character. Be careful! </p>
+                <b-button variant="warning" @click="$emit('reset-active')" class="mb-3">
                     <p class="tiny">RESET MY CURRENT OPTION</p>
+                    <font-awesome-icon :icon="['fas', 'retweet']" class="icon"/>
+                </b-button>
+
+                <b-button variant="danger" @click="$emit('reset-all')">
+                    <p class="tiny">RESET ALL OPTION</p>
                     <font-awesome-icon :icon="['fas', 'retweet']" class="icon"/>
                 </b-button>
             </b-col>
@@ -168,10 +173,10 @@
                 <p class="tiny">HUE</p>
             </b-col>
             <b-col cols="7">
-                <b-form-input debounce="500" min="0" max="360" v-model="activeHue" type="range"></b-form-input>
+                <b-form-input class="hue" debounce="500" min="0" max="360" v-model="activeHue" type="range" key="hue"></b-form-input>
             </b-col>
             <b-col cols="3">
-                <b-form-input debounce="500" min="0" max="360" v-model="activeHue" type="number"></b-form-input>
+                <b-form-input class="hue" debounce="500" min="0" max="360" v-model="activeHue" type="number" key="hueNumber"></b-form-input>
             </b-col>
         </b-row>
         
@@ -180,10 +185,10 @@
                 <p class="tiny">SATURATION</p>
             </b-col>
             <b-col cols="5">
-                <b-form-input debounce="500" min="0" max="100" v-model="activeSaturation" type="range"></b-form-input>
+                <b-form-input class="saturation" debounce="500" min="0" max="100" v-model="activeSaturation" type="range" key="saturation"></b-form-input>
             </b-col>
             <b-col cols="3">
-                <b-form-input debounce="500" min="0" max="100" v-model="activeSaturation" type="number"></b-form-input>
+                <b-form-input class="saturation" debounce="500" min="0" max="100" v-model="activeSaturation" type="number" key="saturationNumber"></b-form-input>
             </b-col>
         </b-row>
         
@@ -192,16 +197,22 @@
                 <p class="tiny">LIGHTNESS</p>
             </b-col>
             <b-col cols="5">
-                <b-form-input debounce="500" min="50" max="100" v-model="activeLightness" type="range"></b-form-input>
+                <b-form-input class="lightness" debounce="500" min="50" max="100" v-model="activeLightness" type="range" key="lightness"></b-form-input>
             </b-col>
             <b-col cols="3">
-                <b-form-input debounce="500" min="50" max="100" v-model="activeLightness" type="number"></b-form-input>
+                <b-form-input class="lightness" debounce="500" min="50" max="100" v-model="activeLightness" type="number" ket="lightnessNumber"></b-form-input>
             </b-col>
         </b-row>
 
-        <b-row class="mb-3" v-if="expandedMenu === 'color'">
+        <b-row class="mb-2" v-if="expandedMenu === 'color'">
             <b-col cols="12">
                 <div class="color" :style="{backgroundColor: activeColor}"></div>
+            </b-col>
+        </b-row>
+
+        <b-row class="mb-2" align-h="center" v-if="expandedMenu === 'color'">
+            <b-col cols="12" class="d-flex justify-content-start">
+                <b-button @click="$emit('swatch-pick', color)" class="p-4 border-0 mr-2" v-for="color in colorHistory" :key="color" :style="{backgroundColor: color}"></b-button>
             </b-col>
         </b-row>
         
@@ -213,7 +224,7 @@
                 </b-button>
             </b-col>
             <b-col cols="6" class="d-flex justify-content-center">
-                <b-button @click="$emit('reset-color')">
+                <b-button @click="$emit('color-match')">
                     <p class="tiny">COLOR MATCH</p>
                     <font-awesome-icon class="icon" :icon="['fas', 'palette']" />
                 </b-button>
@@ -232,19 +243,31 @@
                 </b-col>
             </b-row>
 
-            <b-row align-h="center" class="mb-3">
-                <b-col cols="5" class="d-flex flex-row justify-content-center
-                align-items-center">
-                    <b-button variant="danger" size="lg"  class="mr-4" @click="$emit('randomize-character')">
-                        <p class="tiny">JUST MESS MY WHOLE THING UP.</p>
+            <b-row align-h="center" class="mb-3 d-flex flex-row justify-content-center align-items-center">
+                <b-col cols="6" class="d-flex flex-row justify-content-center align-items-center">
+                    <b-button variant="danger" size="lg" @click="$emit('re-roll-features')">
+                        <p class="tiny">RANDOMIZE FEATURES</p>
                         <font-awesome-icon class="icon" :icon="['fas', 'dice']" />
                     </b-button>
                 </b-col>
-                <b-col cols="5" class="d-flex flex-row justify-content-center
-                align-items-center">
-                    <b-button variant="danger" size="lg" @click="$emit('reset-character')">
-                        <p class="tiny">MESS ME UP, BUT KEEP THINGS NEAT.</p>
-                        <font-awesome-icon class="icon" :icon="['fas', 'sync']" />
+                <b-col cols="6" class="d-flex flex-row justify-content-center align-items-center">
+                    <b-button variant="danger" size="lg" @click="$emit('reset-colors')">
+                        <p class="tiny">RANDOMIZE COLORS</p>
+                        <font-awesome-icon class="icon" :icon="['fas', 'dice']" />
+                    </b-button>
+                </b-col>
+            </b-row>
+            <b-row align-h="center" class="mb-3 d-flex flex-row justify-content-center align-items-center">
+                <b-col cols="6" class="d-flex flex-row justify-content-center align-items-center">
+                    <b-button variant="danger" size="lg" @click="$emit('reset-colors', 'fullRandom')">
+                        <p class="tiny">RANDOMIZE EVERYTHING</p>
+                        <font-awesome-icon class="icon" :icon="['fas', 'dice']" />
+                    </b-button>
+                </b-col>
+                <b-col cols="6" class="d-flex flex-row justify-content-center align-items-center">
+                    <b-button variant="danger" size="lg" @click="$emit('randomize-character')">
+                        <p class="tiny">WHACKY RANDOMIZATION</p>
+                        <font-awesome-icon class="icon" :icon="['fas', 'dice']" />
                     </b-button>
                 </b-col>
             </b-row>
@@ -276,7 +299,7 @@
 
 <script>
     export default {
-        props:['type', 'maxRange', 'which', 'hidden', 'expandedMenu', 'color', 'hue', 'saturation', 'lightness'],
+        props:['type', 'maxRange', 'which', 'hidden', 'expandedMenu', 'color', 'hue', 'saturation', 'lightness', 'colorHistory'],
         computed: {
             selected: {
                 get: function() {
@@ -335,7 +358,7 @@
     }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
 .fa-rotate-45 {
     -webkit-transform: rotate(45deg);
@@ -357,16 +380,9 @@
     animation-direction: reverse;
 }
 
-.line {
-    width:1px;
-    height:150px;
-    margin:0 10px;
-    border-right:solid black 2px;
-}
-
 .color {
-    border: solid 2px black;
     height:50px;
     width:100%;
 }
+
 </style>

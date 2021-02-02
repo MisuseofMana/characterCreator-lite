@@ -27,12 +27,18 @@
           @scale-sprite="scaleSprite($event)"
           @move-layer="moveLayer($event)"
           @randomize-character="randomize()"
-          @reset-character="reRoll()"
+          @reset-colors="reRollColors($event)"
+          @reset-color="resetColor()"
           @reset-active="resetActive()"
+          @reset-all="resetAll()"
           @set-open="setOpen($event)"
           @new-hue="setHue($event)"
+          @save-color="saveColor($event)"
           @new-saturation="setSaturation($event)"
           @new-lightness="setLightness($event)"
+          @color-match="colorMatch($event)"
+          @swatch-pick="swatchPick($event)"
+          @re-roll-features="reRollFeatures()"
           :hidden="selections[activeIndex].disable"
           :type="active"
           :activeColor="selections[activeIndex].color"
@@ -43,19 +49,24 @@
           :key="`${active}editor`" 
           :which="selections[activeIndex].which"
           :expandedMenu="expandedMenu"
-          :colorList="colorList"
+          :colorHistory="colorList"
         />
 
   <b-col cols="12" xl="5" class="mb-4 d-flex flex-row justify-content-center">
     <b-row align-h="center">
-    <b-col cols="12" sm="11" md="10" class="d-flex flex-column justify-content-center ">
+    <b-col cols="12" sm="12" md="10" class="d-flex flex-column justify-content-center ">
       <b-row class="mb-3">
           <b-col cols="12" class="d-flex justify-content-center">
               <p class="tiny" :key="this.selections[this.activeIndex].name">Editing {{this.selections[this.activeIndex].name.replace('-', ' ').toUpperCase() }} : v.{{ this.selections[this.activeIndex].which}}</p>
           </b-col>
       </b-row>
-      <canvas id="canvas" class="mb-3" width="500" height="500"></canvas>
-
+      
+      <b-row align-h="center" class="d-flex flex-row justify-content-center">
+        <b-col cols="12" class="d-flex flex-row justify-content-center">
+          <canvas id="canvas" class="mb-3" width="500" height="500"></canvas>
+        </b-col>
+      </b-row>
+      
       <LoadingSpinner v-show="false" key="loader"/>
       <b-button id="download" class="mb-3" @click="downloadImage()">
         <h1 class="responsiveFont">
@@ -319,29 +330,7 @@ export default {
       defaultColor:'rgba(255,255,255,0.3)',
       imagesToLoad:0,
       expandedMenu: 'choose',
-      colorList: {
-        none:null,
-        pale:'rgb(248, 220, 180)',
-        peach:'rgb(248, 192, 160)',
-        tan:'rgb(220, 131, 100)',
-        brown:'rgb(119, 58, 23)',
-        darkBrown:'rgb(85, 60, 46)',
-        black:'rgb(30, 10, 30)',
-        pink:'rgb(255, 106, 106)',
-        red:'rgb(180, 0, 0)',
-        orange:'rgb(255, 105, 18)',
-        burntOrange:'rgb(200, 100, 0)',
-        yellow:'rgb(255, 225, 0)',
-        gold:'rgb(255, 190, 0)',
-        lightGreen:'rgb(120, 255, 200)',
-        blueGreen:'rgb(66, 245, 155)',
-        green:'rgb(50, 180, 100)',
-        blue:'rgb(0, 50, 255)',
-        darkBlue:'rgb(0, 0, 100)',
-        indigo:'rgb(50, 14, 100)',
-        purple:'rgb(151, 14, 105)',
-        neonPurple:'rgb(255, 0, 200)',
-    }
+      colorList: [],
     }
   },
   computed: {
@@ -517,7 +506,6 @@ export default {
       this.init();
     },
     rotateClockwise(e) {
-      console.log('clockwise', e)
       this.selections[this.activeIndex].rotation += e
       if(this.selections[this.activeIndex].rotation >= 24) {
         this.selections[this.activeIndex].rotation = 0;
@@ -525,7 +513,6 @@ export default {
       this.init()
     },
     rotateAntiClockwise(e) {
-      console.log('anti-clockwise', e)
       this.selections[this.activeIndex].rotation -= e
       if(this.selections[this.activeIndex].rotation <= -24) {
         this.selections[this.activeIndex].rotation = 0;
@@ -547,7 +534,6 @@ export default {
       let indexFrom = this.activeIndex;
       let forwardIndex = indexFrom++;
       let backwardIndex = indexFrom--;
-      console.log(backwardIndex, indexFrom, forwardIndex, )
 
       if(forwardIndex > this.selections.length - 1) {
         forwardIndex = 0;
@@ -558,8 +544,6 @@ export default {
       }
 
       let movingItem = this.selections[indexFrom]
-      console.log(movingItem.name)
-      
       if(e === 'up') {
         this.selections[indexFrom] = this.selections[forwardIndex];
         this.selections[forwardIndex] = movingItem;
@@ -577,6 +561,39 @@ export default {
       this.selections[this.activeIndex].which = randomPick;
       this.selections[this.activeIndex].disable = false;
       this.init();
+    },
+    addNewColor() {
+      let active = this.selections[this.activeIndex]
+      if(this.colorList.length >= 8){
+        this.colorList.pop()
+      } 
+      
+      this.colorList.unshift(`hsl(${active.hue}, ${active.saturation}%, ${active.lightness}%)`);
+      
+    },
+    colorMatch() {
+      let matchHue = this.selections[this.activeIndex].hue
+      let matchSat = this.selections[this.activeIndex].saturation
+      let matchLight = this.selections[this.activeIndex].lightness
+      let options = this.selections;
+      let currentSelected = this.selections[this.activeIndex].name
+
+      const skin = ['body', 'ears', 'nose'];
+      const hair = ['hair-front', 'hair-back', 'brows', 'mouth'];
+      const extra = ['clothes', 'extras'];
+
+        for(let item of options){
+          if(skin.includes(currentSelected) && skin.includes(item.name)){
+            this.assignHSL([matchHue, matchSat, matchLight], item);
+          }
+          if(hair.includes(currentSelected) && hair.includes(item.name)){
+            this.assignHSL([matchHue, matchSat, matchLight], item);
+          }
+          if(extra.includes(currentSelected) && extra.includes(item.name)){
+            this.assignHSL([matchHue, matchSat, matchLight], item);
+          }
+        }
+      this.init()
     },
     randomNumber(min,max){
       return Math.floor(Math.random() * (max - min + 1) + min);
@@ -602,40 +619,90 @@ export default {
     setOpen(e){
       this.expandedMenu = e;
     },
+    swatchPick(e){
+      let parsedHSL = e.slice(4, -1).replaceAll(',', '').replaceAll('%', '');
+      let hslArray = parsedHSL.split(' ')
+      this.assignHSL(hslArray, this.selections[this.activeIndex])
+      this.init()
+    },
     setHue(e){
       this.selections[this.activeIndex].color = true
       this.selections[this.activeIndex].hue = e
+      this.addNewColor()
       this.init()
     },
     setSaturation(e){
       this.selections[this.activeIndex].color = true
       this.selections[this.activeIndex].saturation = e
+      this.addNewColor()
       this.init()
     },
     setLightness(e){
       this.selections[this.activeIndex].color = true
       this.selections[this.activeIndex].lightness = e
+      this.addNewColor()
       this.init()
     },
     resetColor() {
-
+      this.selections[this.activeIndex].color = false
+      this.selections[this.activeIndex].hue = 0
+      this.selections[this.activeIndex].saturation = 0
+      this.selections[this.activeIndex].lightness = 50
+      this.init()
     },
-    reRoll() {
+    reRollColors(e) {
+      const skin = [this.randomNumber(1,50), this.randomNumber(15,55), this.randomNumber(50,95)];
+      const hair = [this.randomNumber(0,360), this.randomNumber(0,100), this.randomNumber(50,100)]
+      const garb = [this.randomNumber(0,360), this.randomNumber(0,50), this.randomNumber(50,75)]
+
+      for(let selection of this.selections){
+        if(e === 'fullRandom'){
+          selection.which = this.randomNumber(1,selection.max-1)
+          selection.left = 0;
+          selection.top = 0;
+          selection.rotation = 0;
+          selection.scaleWidth = 500;
+          selection.scaleHeight = 500;
+        }
+
+        switch (selection.name) {
+          case 'body':
+          case 'ears':
+          case 'nose':
+            this.assignHSL(skin, selection)
+            break;
+          case 'hair-front':
+          case 'hair-back':
+          case 'brows':
+          case 'mouth':
+            this.assignHSL(hair, selection)
+            break;
+          case 'clothes':
+          case 'extra':
+            this.assignHSL(garb, selection)
+            break;
+          default:
+            selection.color = false;
+        }
+    }
+        this.init();
+    },
+    reRollFeatures(){
       for(let selection of this.selections){
         selection.which = this.randomNumber(1,selection.max-1)
         selection.left = 0;
         selection.top = 0;
-        selection.color = true;
         selection.rotation = 0;
         selection.scaleWidth = 500;
         selection.scaleHeight = 500;
-
-        if(selection.name === "body") {
-          selection.hue = this.randomNumber(1,selection.max-1);
-        }
-
-    }
-        this.init();
+      }
+      this.init()
+    },
+    assignHSL(array, selection){
+      selection.color = true;
+      selection.hue = array[0]
+      selection.saturation = array[1]
+      selection.lightness = array[2]
     },
     resetActive(){
       this.selections[this.activeIndex].left = 0;
@@ -645,6 +712,20 @@ export default {
       this.selections[this.activeIndex].scaleWidth = 500;
       this.selections[this.activeIndex].scaleHeight = 500;
       this.selections[this.activeIndex].disable = false;
+      this.init();
+    },
+    resetAll(){
+      for(let selection of this.selections){
+        selection.left = 0;
+        selection.top = 0;
+        selection.hue = 0;
+        selection.saturation = 0;
+        selection.lightness = 0;
+        selection.rotation = 0;
+        selection.scaleWidth = 500;
+        selection.scaleHeight = 500;
+        selection.disable = false;
+      }
       this.init();
     },
     downloadImage(){
@@ -658,7 +739,7 @@ export default {
     },
   },
   mounted(){
-    let random = Math.floor(Math.random() * 6)
+    let random = this.randomNumber(0,6)
     //add snipped image paths to appropriate arrays in the selections array
     for(let selection in this.selections){
       let current = this.selections[selection];

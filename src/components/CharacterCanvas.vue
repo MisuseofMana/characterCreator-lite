@@ -30,9 +30,15 @@
           @reset-character="reRoll()"
           @reset-active="resetActive()"
           @set-open="setOpen($event)"
+          @new-hue="setHue($event)"
+          @new-saturation="setSaturation($event)"
+          @new-lightness="setLightness($event)"
           :hidden="selections[activeIndex].disable"
           :type="active"
           :activeColor="selections[activeIndex].color"
+          :hue="selections[activeIndex].hue"
+          :saturation="selections[activeIndex].saturation"
+          :lightness="selections[activeIndex].lightness"
           :maxRange="selections[activeIndex].max" 
           :key="`${active}editor`" 
           :which="selections[activeIndex].which"
@@ -43,7 +49,13 @@
   <b-col cols="12" xl="5" class="mb-4 d-flex flex-row justify-content-center">
     <b-row align-h="center">
     <b-col cols="12" sm="11" md="10" class="d-flex flex-column justify-content-center ">
+      <b-row class="mb-3">
+          <b-col cols="12" class="d-flex justify-content-center">
+              <p class="tiny" :key="this.selections[this.activeIndex].name">Editing {{this.selections[this.activeIndex].name.replace('-', ' ').toUpperCase() }} : v.{{ this.selections[this.activeIndex].which}}</p>
+          </b-col>
+      </b-row>
       <canvas id="canvas" class="mb-3" width="500" height="500"></canvas>
+
       <LoadingSpinner v-show="false" key="loader"/>
       <b-button id="download" class="mb-3" @click="downloadImage()">
         <h1 class="responsiveFont">
@@ -91,9 +103,12 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 7,
+          max: 9,
           disable: false,
-          color: null
+          color:false,
+          hue:0,
+          saturation:0,
+          lightness:50,
         },
         {
           name: 'body',
@@ -110,9 +125,12 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 6,
+          max: 8,
           disable: false,
-          color: null
+          color:false,
+          hue:0,
+          saturation:0,
+          lightness:50,
         },
 
         {
@@ -130,9 +148,12 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max:16,
+          max:21,
           disable: false,
-          color: null
+          color:false,
+          hue:0,
+          saturation:0,
+          lightness:50,
         },
 
         {
@@ -150,9 +171,12 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max:9,
+          max:12,
           disable: false,
-          color: null
+          color:false,
+          hue:0,
+          saturation:0,
+          lightness:50,
         },
 
         {
@@ -170,9 +194,12 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 11,
+          max: 17,
           disable: false,
-          color: null
+          color:false,
+          hue:0,
+          saturation:0,
+          lightness:50,
         },
 
         {
@@ -190,9 +217,12 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 11,
+          max: 15,
           disable: false,
-          color: null
+          color:false,
+          hue:0,
+          saturation:0,
+          lightness:50,
         },
 
         {
@@ -210,9 +240,12 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 10,
+          max: 12,
           disable: false,
-          color: null
+          color:false,
+          hue:0,
+          saturation:0,
+          lightness:50,
         },
         
         {
@@ -230,9 +263,12 @@ export default {
           rotation:0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 14,
+          max: 15,
           disable: false,
-          color: null
+          color:false,
+          hue:0,
+          saturation:0,
+          lightness:50,
         },
 
         {
@@ -250,9 +286,12 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 8,
+          max: 11,
           disable: false,
-          color: null
+          color:false,
+          hue:0,
+          saturation:0,
+          lightness:50,
         },
         {
           name:'clothes',
@@ -271,7 +310,10 @@ export default {
           scaleHeight:500,
           max: 7,
           disable: false,
-          color: null
+          color:false,
+          hue:0,
+          saturation:0,
+          lightness:50,
         },
       ],
       defaultColor:'rgba(255,255,255,0.3)',
@@ -381,14 +423,35 @@ export default {
         
           if(current.disable === false) {
             if(current.sprites.flatImg){
-              this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+              
+              // if (current.color !== null && current.sprites) {
+                //   this.stagectx.fillStyle = current.color;
+              //   this.stagectx.globalCompositeOperation = "source-atop";
+              //   this.stagectx.fillRect(0, 0, 500, 500);
+              // }
+              if(current.color === true){
+                // this.stagectx.globalCompositeOperation = "source-atop";
+                // `hsl(${current.hue}, ${current.saturation}%, ${current.lightness}%)`
+                this.stagectx.globalCompositeOperation = current.lightness < 100 ? "color-burn" : "color-dodge";
+                this.stagectx.fillStyle = `hsl(0, 50%, ${current.lightness}%)`;
+                this.stagectx.fillRect(0, 0, 500, 500);
+
+                this.stagectx.globalCompositeOperation = "saturation";
+                this.stagectx.fillStyle = `hsl(0, ${current.saturation}%, 50%)`;
+                this.stagectx.fillRect(0, 0, 500, 500);
+                
+                this.stagectx.globalCompositeOperation = "hue";
+                this.stagectx.fillStyle = `hsl(${current.hue}, 1%, 50%)`;
+                this.stagectx.fillRect(0, 0, 500, 500);
+
+                this.stagectx.globalCompositeOperation = "destination-in";
+                this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+              }
+              else {
+                this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+              }
             }
-            
-            if (current.color !== null && current.sprites) {
-              this.stagectx.fillStyle = current.color;
-              this.stagectx.globalCompositeOperation = "source-atop";
-              this.stagectx.fillRect(0, 0, 500, 500);
-            }
+
             this.stagectx.globalCompositeOperation = "source-over";
 
             if(current.sprites.lineImg){
@@ -469,10 +532,6 @@ export default {
       }
       this.init()
     },
-    resetRotation(){
-
-       this.init();
-    },
     disableItem(e) {
       if(e === 'disable') {
         this.selections[this.activeIndex].disable = true;
@@ -519,31 +578,23 @@ export default {
       this.selections[this.activeIndex].disable = false;
       this.init();
     },
-    changeColor(e) {
-      if(e === null){
-        this.selections[this.activeIndex].color = null;
-      }
-      else{
-      let colorString = e.replace('(','a(').replace(')',', 0.3)')
-      this.selections[this.activeIndex].color = colorString;
-      }
-      this.init();
+    randomNumber(min,max){
+      return Math.floor(Math.random() * (max - min + 1) + min);
     },
     randomize() {
       for(let selection of this.selections){
-        let randomProperty = () => {
-            let keys = Object.keys(this.colorList);
-            return this.colorList[keys[ keys.length * Math.random() << 0]];
-        };
-        let getRandomColor = randomProperty();
-        if(getRandomColor !== null){
-          selection.color = getRandomColor.replace('(','a(').replace(')',', 0.3)');
-        }
-        else {
-          selection.color = null;
-        }
-        let randomPick = Math.floor(Math.random() * selection.max);
-        selection.which = randomPick;
+        // let randomProperty = () => {
+        //     let keys = Object.keys(this.colorList);
+        //     return this.colorList[keys[ keys.length * Math.random() << 0]];
+        // };
+        // let getRandomColor = randomProperty();
+  
+        selection.color = true
+        selection.hue = this.randomNumber(0, 359)
+        selection.saturation = this.randomNumber(0,100)
+        selection.lightness = this.randomNumber(50,100)
+        
+        selection.which = this.randomNumber(1,selection.max-1);
         selection.disable = false;
       }
         this.init()
@@ -551,16 +602,38 @@ export default {
     setOpen(e){
       this.expandedMenu = e;
     },
+    setHue(e){
+      this.selections[this.activeIndex].color = true
+      this.selections[this.activeIndex].hue = e
+      this.init()
+    },
+    setSaturation(e){
+      this.selections[this.activeIndex].color = true
+      this.selections[this.activeIndex].saturation = e
+      this.init()
+    },
+    setLightness(e){
+      this.selections[this.activeIndex].color = true
+      this.selections[this.activeIndex].lightness = e
+      this.init()
+    },
+    resetColor() {
+
+    },
     reRoll() {
       for(let selection of this.selections){
-        let randomPick = Math.floor(Math.random() * selection.max);
-        selection.which = randomPick
+        selection.which = this.randomNumber(1,selection.max-1)
         selection.left = 0;
         selection.top = 0;
-        selection.color = null;
+        selection.color = true;
         selection.rotation = 0;
         selection.scaleWidth = 500;
         selection.scaleHeight = 500;
+
+        if(selection.name === "body") {
+          selection.hue = this.randomNumber(1,selection.max-1);
+        }
+
     }
         this.init();
     },

@@ -1,7 +1,7 @@
 <template>
     <b-col cols="12" xl="5" class="mb-3">
         <b-row class="mb-3" align-h="center">
-            <b-col cols="11" class="d-flex flex-row justify-content-center align-items-center">
+            <b-col cols="11" class="d-flex flex-row justify-content-center align-items-center mb-3">
                 <b-button-group>
                     <b-button :disabled="expandedMenu === 'random'" variant="warning" @click="$emit('set-open', 'random')">
                        <p class="tiny">RANDOM</p> <font-awesome-icon  class="icon" :icon="['fas', 'dice']" />
@@ -57,7 +57,7 @@
         <!-- MOVE -->
         <b-row v-if="expandedMenu === 'move'" align-h="around" class="d-flex flex-row justify-content-center align-items-center mb-3">
             <b-col cols="5" class="d-flex flex-column justify-content-center align-items-center">
-                <b-button-group>
+                <b-button-group class="mb-1">
                     <b-button class="editorButton" @click="reposition(-5, 'xy-neg')">
                         <font-awesome-icon class="fa-rotate-n45 icon" :icon="['fas', 'arrow-up']" />
                     </b-button>
@@ -69,7 +69,7 @@
                     </b-button>
                 </b-button-group>
 
-                <b-button-group>
+                <b-button-group class="mb-1">
                     <b-button class="editorButton" @click="reposition(-5, 'x')">
                         <font-awesome-icon class="icon" :icon="['fas', 'arrow-left']" />
                     </b-button>
@@ -140,10 +140,10 @@
         </b-row>
 
         <!-- COLOR -->
-        <b-row v-if="expandedMenu === 'color'" class="mb-3">
-            <b-col sm="12" class="d-flex flex-wrap justify-content-center">
+        <!-- <b-row v-if="expandedMenu === 'color'" class="mb-3">
+            <b-col cols="12" class="d-flex flex-wrap justify-content-center">
                 <span v-for="color in colorList" :key="color">
-                    <div @click="changeColor(color)" :style="{backgroundColor:color}" :class="{'dotborder':color === null || color === 'rgb(255, 255, 255)' }" class="dot">
+                    <div @click="changeColor(color)" :style="{backgroundColor:color}" :class="{'dotborder':color === null || color === 'rgb(255, 255, 255)' }" class="dot" >
                         <span v-if="color===null && currentColor !== null">
                             <font-awesome-icon class="icon" style="color:tomato" :icon="['fas', 'sync']" />
                         </span>
@@ -161,7 +161,69 @@
                     </div>
                 </span>
             </b-col>
+        </b-row> -->
+
+        <b-row v-if="expandedMenu === 'color'" align-v="center" class="mb-3">
+            <b-col cols="2">
+                <p class="tiny">HUE</p>
+            </b-col>
+            <b-col cols="7">
+                <b-form-input debounce="500" min="0" max="360" v-model="activeHue" type="range"></b-form-input>
+            </b-col>
+            <b-col cols="3">
+                <b-form-input debounce="500" min="0" max="360" v-model="activeHue" type="number"></b-form-input>
+            </b-col>
         </b-row>
+        
+        <b-row v-if="expandedMenu === 'color'" align-v="center" class="mb-3">
+            <b-col cols="4">
+                <p class="tiny">SATURATION</p>
+            </b-col>
+            <b-col cols="5">
+                <b-form-input debounce="500" min="0" max="100" v-model="activeSaturation" type="range"></b-form-input>
+            </b-col>
+            <b-col cols="3">
+                <b-form-input debounce="500" min="0" max="100" v-model="activeSaturation" type="number"></b-form-input>
+            </b-col>
+        </b-row>
+        
+        <b-row v-if="expandedMenu === 'color'" align-v="center" class="mb-3">
+            <b-col cols="4">
+                <p class="tiny">LIGHTNESS</p>
+            </b-col>
+            <b-col cols="5">
+                <b-form-input debounce="500" min="50" max="100" v-model="activeLightness" type="range"></b-form-input>
+            </b-col>
+            <b-col cols="3">
+                <b-form-input debounce="500" min="50" max="100" v-model="activeLightness" type="number"></b-form-input>
+            </b-col>
+        </b-row>
+
+        <b-row class="mb-3" v-if="expandedMenu === 'color'">
+            <b-col cols="12">
+                <div class="color" :style="{backgroundColor: activeColor}"></div>
+            </b-col>
+        </b-row>
+        
+        <b-row class="mb-3" align-h="center" v-if="expandedMenu === 'color'">
+            <b-col cols="6" class="d-flex justify-content-center">
+                <b-button variant="warning" @click="$emit('reset-color')">
+                    <p class="tiny">RESET COLOR</p>
+                    <font-awesome-icon class="icon" :icon="['fas', 'retweet']" />
+                </b-button>
+            </b-col>
+            <b-col cols="6" class="d-flex justify-content-center">
+                <b-button @click="$emit('reset-color')">
+                    <p class="tiny">COLOR MATCH</p>
+                    <font-awesome-icon class="icon" :icon="['fas', 'palette']" />
+                </b-button>
+            </b-col>
+        </b-row>
+
+
+
+
+
 
         <span v-if="expandedMenu === 'random'">
             <b-row class="mb-3" align-h="center">
@@ -207,11 +269,6 @@
                     </div>
                 </div>
             </div> -->
-            <b-row>
-                <b-col cols="12" class="d-flex justify-content-center">
-                    <p class="tiny" :key="type">Editing {{ type.replace('-', ' ').toUpperCase() }} : v.{{ selected}}</p>
-                </b-col>
-            </b-row>
 
             </b-col>
 
@@ -219,7 +276,7 @@
 
 <script>
     export default {
-        props:['type', 'maxRange', 'which', 'hidden', 'expandedMenu', 'colorList', 'activeColor'],
+        props:['type', 'maxRange', 'which', 'hidden', 'expandedMenu', 'color', 'hue', 'saturation', 'lightness'],
         computed: {
             selected: {
                 get: function() {
@@ -230,12 +287,35 @@
                     return newValue
                 }
             },
-            currentColor: function() {
-                if(this.activeColor === null){
-                    return null
+            activeHue: {
+                get: function() {
+                    return this.hue
+                },
+                set: function (newValue){
+                    this.$emit('new-hue', newValue);
+                    return newValue
                 }
-                let formattedColor = this.activeColor.replace('rgba', 'rgb').replace(', 0.3', '');
-                return formattedColor;
+            },
+            activeSaturation: {
+                get: function() {
+                    return this.saturation
+                },
+                set: function (newValue){
+                    this.$emit('new-saturation', newValue);
+                    return newValue
+                }
+            },
+            activeLightness: {
+                get: function() {
+                    return this.lightness
+                },
+                set: function (newValue){
+                    this.$emit('new-lightness', newValue);
+                    return newValue
+                }
+            },
+            activeColor: function () {
+                return `hsl(${this.hue}, ${this.saturation}%, ${this.lightness}%)`
             }
         },
         methods: {
@@ -282,5 +362,11 @@
     height:150px;
     margin:0 10px;
     border-right:solid black 2px;
+}
+
+.color {
+    border: solid 2px black;
+    height:50px;
+    width:100%;
 }
 </style>

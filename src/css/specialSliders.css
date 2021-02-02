@@ -1,0 +1,235 @@
+/* HUE */
+input[type=range].hue::-webkit-slider-runnable-track {
+    background: linear-gradient(
+        to right,
+        #ff0000 0%,
+        #ffff00 17%,
+        #00ff00 33%,
+        #00ffff 50%,
+        #0000ff 67%,
+        #ff00ff 83%,
+        #ff0000 100%
+      );
+  }
+  
+  input[type=range].hue:focus::-webkit-slider-runnable-track {
+    background: linear-gradient(
+        to right,
+        #ff0000 0%,
+        #ffff00 17%,
+        #00ff00 33%,
+        #00ffff 50%,
+        #0000ff 67%,
+        #ff00ff 83%,
+        #ff0000 100%
+      );
+  }
+  
+  input[type=range].hue::-moz-range-track {
+     background: linear-gradient(
+        to right,
+        #ff0000 0%,
+        #ffff00 17%,
+        #00ff00 33%,
+        #00ffff 50%,
+        #0000ff 67%,
+        #ff00ff 83%,
+        #ff0000 100%
+      );
+  }
+  
+  input[type=range].hue::-ms-track {
+    background: linear-gradient(
+        to right,
+        #ff0000 0%,
+        #ffff00 17%,
+        #00ff00 33%,
+        #00ffff 50%,
+        #0000ff 67%,
+        #ff00ff 83%,
+        #ff0000 100%
+      );
+  }
+
+  input[type=range].hue::-ms-fill-lower {
+     background: linear-gradient(
+        to right,
+        #ff0000 0%,
+        #ffff00 17%,
+        #00ff00 33%,
+        #00ffff 50%,
+        #0000ff 67%,
+        #ff00ff 83%,
+        #ff0000 100%
+      );
+  }
+
+  input[type=range].hue:focus::-ms-fill-lower {
+     background: linear-gradient(
+        to right,
+        #ff0000 0%,
+        #ffff00 17%,
+        #00ff00 33%,
+        #00ffff 50%,
+        #0000ff 67%,
+        #ff00ff 83%,
+        #ff0000 100%
+      );
+  }
+
+  input[type=range].hue::-ms-fill-upper {
+     background: linear-gradient(
+        to right,
+        #ff0000 0%,
+        #ffff00 17%,
+        #00ff00 33%,
+        #00ffff 50%,
+        #0000ff 67%,
+        #ff00ff 83%,
+        #ff0000 100%
+      );
+  }
+
+  input[type=range].hue:focus::-ms-fill-upper {
+     background: linear-gradient(
+        to right,
+        #ff0000 0%,
+        #ffff00 17%,
+        #00ff00 33%,
+        #00ffff 50%,
+        #0000ff 67%,
+        #ff00ff 83%,
+        #ff0000 100%
+      );
+  }
+
+  /* SATURATION */
+  input[type=range].saturation::-webkit-slider-runnable-track {
+    background: linear-gradient(
+        to right,
+        #ffffff 0%,
+        #ff0000 100%
+      );
+  }
+  
+  input[type=range].saturation:focus::-webkit-slider-runnable-track {
+    background: linear-gradient(
+      to right,
+      #ffffff 0%,
+      #ff0000 100%
+    );
+  }
+  
+  input[type=range].saturation::-moz-range-track {
+    background: linear-gradient(
+      to right,
+      #ffffff 0%,
+      #ff0000 100%
+    );
+  }
+  
+  input[type=range].saturation::-ms-track {
+    background: linear-gradient(
+      to right,
+      #ffffff 0%,
+      #ff0000 100%
+    );
+  }
+
+  input[type=range].saturation::-ms-fill-lower {
+    background: linear-gradient(
+      to right,
+      #ffffff 0%,
+      #ff0000 100%
+    );
+  }
+
+  input[type=range].saturation:focus::-ms-fill-lower {
+    background: linear-gradient(
+      to right,
+      #ffffff 0%,
+      #ff0000 100%
+    );
+  }
+
+  input[type=range].saturation::-ms-fill-upper {
+    background: linear-gradient(
+      to right,
+      #ffffff 0%,
+      #ff0000 100%
+    );
+  }
+
+  input[type=range].saturation:focus::-ms-fill-upper {
+    background: linear-gradient(
+      to right,
+      #ffffff 0%,
+      #ff0000 100%
+    );
+  }
+
+
+  /* LIGHTNESS */
+  input[type=range].lightness::-webkit-slider-runnable-track {
+    background: linear-gradient(
+        to right,
+        #000000 0%,
+        #ffffff 100%
+      );
+  }
+  
+  input[type=range].lightness:focus::-webkit-slider-runnable-track {
+    background: linear-gradient(
+        to right,
+        #000000 0%,
+        #ffffff 100%
+      );
+  }
+  
+  input[type=range].lightness::-moz-range-track {
+    background: linear-gradient(
+        to right,
+        #000000 0%,
+        #ffffff 100%
+      );
+  }
+  
+  input[type=range].lightness::-ms-track {
+    background: linear-gradient(
+        to right,
+        #000000 0%,
+        #ffffff 100%
+      );
+  }
+
+  input[type=range].lightness::-ms-fill-lower {
+    background: linear-gradient(
+        to right,
+        #000000 0%,
+        #ffffff 100%
+      );
+  }
+
+  input[type=range].lightness:focus::-ms-fill-lower {
+    background: linear-gradient(
+        to right,
+        #000000 0%,
+        #ffffff 100%
+      );
+  }
+
+  input[type=range].lightness::-ms-fill-upper {
+    background: linear-gradient(
+        to right,
+        #000000 0%,
+        #ffffff 100%
+      );
+  }
+
+  input[type=range].lightness:focus::-ms-fill-upper {
+    background: linear-gradient(
+        to right,
+        #000000 0%,
+        #ffffff 100%
+      );
+  }

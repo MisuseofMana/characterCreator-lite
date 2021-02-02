@@ -16,6 +16,9 @@
 
 <script>
 import '@/css/globals.scss'
+import '@/css/inputSlidersReset.css'
+import '@/css/inputSliders.css'
+import '@/css/specialSliders.css'
 
 import CharacterCanvas from "@/components/CharacterCanvas"
 

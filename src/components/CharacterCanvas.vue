@@ -21,6 +21,7 @@
           @random-item="randomItem()"
           @disable-item="disableItem($event)"
           @change-color="changeColor($event)"
+          @random-active-color="randomActiveColor()"
           @rotate-clockwise="rotateClockwise($event)"
           @rotate-anti-clockwise="rotateAntiClockwise($event)"
           @reset-rotation="resetRotation()"
@@ -33,9 +34,9 @@
           @reset-all="resetAll()"
           @set-open="setOpen($event)"
           @new-hue="setHue($event)"
-          @save-color="saveColor($event)"
           @new-saturation="setSaturation($event)"
           @new-lightness="setLightness($event)"
+          @save-color="saveColor($event)"
           @color-match="colorMatch($event)"
           @swatch-pick="swatchPick($event)"
           @re-roll-features="reRollFeatures()"
@@ -78,7 +79,7 @@
     </b-row>
   </b-col>
   
-  <canvas class="hidden" width="500" height="500" id="stageCanvas"></canvas>
+  <canvas class="d-none" width="500" height="500" id="stageCanvas"></canvas>
 
 </b-row>
 </template>
@@ -119,7 +120,7 @@ export default {
           color:false,
           hue:0,
           saturation:0,
-          lightness:50,
+          lightness:0
         },
         {
           name: 'body',
@@ -141,7 +142,7 @@ export default {
           color:false,
           hue:0,
           saturation:0,
-          lightness:50,
+          lightness:0
         },
 
         {
@@ -164,7 +165,7 @@ export default {
           color:false,
           hue:0,
           saturation:0,
-          lightness:50,
+          lightness:0
         },
 
         {
@@ -187,7 +188,7 @@ export default {
           color:false,
           hue:0,
           saturation:0,
-          lightness:50,
+          lightness:0
         },
 
         {
@@ -210,7 +211,7 @@ export default {
           color:false,
           hue:0,
           saturation:0,
-          lightness:50,
+          lightness:0
         },
 
         {
@@ -233,7 +234,7 @@ export default {
           color:false,
           hue:0,
           saturation:0,
-          lightness:50,
+          lightness:0
         },
 
         {
@@ -256,7 +257,7 @@ export default {
           color:false,
           hue:0,
           saturation:0,
-          lightness:50,
+          lightness:0
         },
         
         {
@@ -279,7 +280,7 @@ export default {
           color:false,
           hue:0,
           saturation:0,
-          lightness:50,
+          lightness:0,
         },
 
         {
@@ -302,7 +303,7 @@ export default {
           color:false,
           hue:0,
           saturation:0,
-          lightness:50,
+          lightness:0
         },
         {
           name:'clothes',
@@ -324,10 +325,9 @@ export default {
           color:false,
           hue:0,
           saturation:0,
-          lightness:50,
+          lightness:0
         },
       ],
-      defaultColor:'rgba(255,255,255,0.3)',
       imagesToLoad:0,
       expandedMenu: 'choose',
       colorList: [],
@@ -381,6 +381,7 @@ export default {
                   if (this.imagesToLoad <= 0) {
                     this.loading = false;
                     this.drawImages();
+                    // this.testDraw();
                   }
                 }
                 img.onerror = () => {
@@ -396,64 +397,79 @@ export default {
         }
       }
     },
+    testDraw() {
+      this.stagectx.clearRect(0,0,500,500)
+      let current = this.selections[4]
+
+      this.stagectx.globalCompositeOperation = "source-over";
+      this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+
+      this.stagectx.globalCompositeOperation = 'lighter';
+      // this.stagectx.globalCompositeOperation = 'lighter';
+      this.stagectx.fillStyle = 'hsl(200, 100%, 50%)';
+      this.stagectx.fillRect(0, 0, 500, 500);
+
+      // this.stagectx.globalCompositeOperation = "saturation";
+      // this.stagectx.fillStyle = `hsl(0, 100%, 50%)`;
+      // this.stagectx.fillRect(0, 0, 500, 500);
+
+      // this.stagectx.globalCompositeOperation = "hue";
+      // this.stagectx.fillStyle = `hsl(200, 1%, 50%)`;
+      // this.stagectx.fillRect(0, 0, 500, 500);
+
+      this.stagectx.globalCompositeOperation = "destination-in";
+      this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+
+      this.stagectx.globalCompositeOperation = "source-over";
+      this.stagectx.drawImage(current.sprites.lineImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+    },
     drawImages(){
-      this.ctx.clearRect(0,0,500,500)
+      this.ctx.clearRect(0,0,500,500) //clear the display canvas
+      this.stagectx.clearRect(0,0,500,500) //clear the display canvas
 
-      for(let selection in this.selections) {
-        this.stagectx.globalCompositeOperation = "source-over";
+      for(let selection in this.selections) { //loop through all selections
+        // this.stagectx.clearRect(0,0,500,500) //clear the display canvas
         let current = this.selections[selection];
-
-        if (current.rotation !== 0) {
-          this.stagectx.save();
-          this.stagectx.translate(250, 250);
-          this.stagectx.rotate(Math.PI / 12 * (current.rotation));
-          this.stagectx.translate(-250, -250); 
-        }
         
-          if(current.disable === false) {
-            if(current.sprites.flatImg){
+        if(current.disable === true) { /*draw nothing if the option is disabled*/ }
+          else {          
+            if (current.rotation !== 0) {
+              this.stagectx.save();
+              this.stagectx.translate(250, 250);
+              this.stagectx.rotate(Math.PI / 12 * (current.rotation));
+              this.stagectx.translate(-250, -250); 
+            }
+    
+            if(current.sprites.flatImg && current.color === true){
+
+              this.stagectx.globalCompositeOperation = "source-over";
+              this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+
+              let mode = current.lightness <= 50 ? 'darken' : 'lighten' 
+              this.stagectx.globalCompositeOperation = mode;
+              this.stagectx.fillStyle = `hsl(${current.hue}, ${current.saturation}%, ${current.lightness}%)`;
+              this.stagectx.fillRect(0, 0, 500, 500);
               
-              // if (current.color !== null && current.sprites) {
-                //   this.stagectx.fillStyle = current.color;
-              //   this.stagectx.globalCompositeOperation = "source-atop";
-              //   this.stagectx.fillRect(0, 0, 500, 500);
-              // }
-              if(current.color === true){
-                // this.stagectx.globalCompositeOperation = "source-atop";
-                // `hsl(${current.hue}, ${current.saturation}%, ${current.lightness}%)`
-                this.stagectx.globalCompositeOperation = current.lightness < 100 ? "color-burn" : "color-dodge";
-                this.stagectx.fillStyle = `hsl(0, 50%, ${current.lightness}%)`;
-                this.stagectx.fillRect(0, 0, 500, 500);
-
-                this.stagectx.globalCompositeOperation = "saturation";
-                this.stagectx.fillStyle = `hsl(0, ${current.saturation}%, 50%)`;
-                this.stagectx.fillRect(0, 0, 500, 500);
-                
-                this.stagectx.globalCompositeOperation = "hue";
-                this.stagectx.fillStyle = `hsl(${current.hue}, 1%, 50%)`;
-                this.stagectx.fillRect(0, 0, 500, 500);
-
-                this.stagectx.globalCompositeOperation = "destination-in";
-                this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
-              }
-              else {
-                this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
-              }
+              this.stagectx.globalCompositeOperation = "destination-in";
+              this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
             }
 
-            this.stagectx.globalCompositeOperation = "source-over";
-
-            if(current.sprites.lineImg){
+            else if(current.sprites.flatImg && current.color !== true){
+              this.stagectx.globalCompositeOperation = "source-over";
+              this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+            }
+    
+            if(current.sprites.lineImg) {
+              this.stagectx.globalCompositeOperation = "source-over";
               this.stagectx.drawImage(current.sprites.lineImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
             }
+    
+            this.stagectx.restore();
           }
-
-        this.stagectx.restore(); 
-        
-        
+        this.ctx.globalCompositeOperation = "source-over";
         this.ctx.drawImage(this.stageCanvas, 0, 0, 500, 500, 0, 0, 500, 500);
-        this.stagectx.clearRect(0,0,500,500);
-      }
+      } //End for loop
+      // this.stagectx.clearRect(0,0,500,500)
     },
     moveSprite(e) {
       if(e.direction === 'y'){
@@ -564,7 +580,7 @@ export default {
     },
     addNewColor() {
       let active = this.selections[this.activeIndex]
-      if(this.colorList.length >= 8){
+      if(this.colorList.length >= 12){
         this.colorList.pop()
       } 
       
@@ -578,8 +594,8 @@ export default {
       let options = this.selections;
       let currentSelected = this.selections[this.activeIndex].name
 
-      const skin = ['body', 'ears', 'nose'];
-      const hair = ['hair-front', 'hair-back', 'brows', 'mouth'];
+      const skin = ['body', 'ears', 'nose', 'mouth'];
+      const hair = ['hair-front', 'hair-back', 'brows'];
       const extra = ['clothes', 'extras'];
 
         for(let item of options){
@@ -609,12 +625,20 @@ export default {
         selection.color = true
         selection.hue = this.randomNumber(0, 359)
         selection.saturation = this.randomNumber(0,100)
-        selection.lightness = this.randomNumber(50,100)
+        selection.lightness = this.randomNumber(15,100)
         
         selection.which = this.randomNumber(1,selection.max-1);
         selection.disable = false;
       }
         this.init()
+    },
+    randomActiveColor() {
+       let selection = this.selections[this.activeIndex]
+      selection.color = true
+      selection.hue = this.randomNumber(0, 359)
+      selection.saturation = this.randomNumber(0,100)
+      selection.lightness = this.randomNumber(15,100)
+      this.init()
     },
     setOpen(e){
       this.expandedMenu = e;
@@ -707,7 +731,10 @@ export default {
     resetActive(){
       this.selections[this.activeIndex].left = 0;
       this.selections[this.activeIndex].top = 0;
-      this.selections[this.activeIndex].color = null;
+      this.selections[this.activeIndex].color = false;
+      this.selections[this.activeIndex].hue = 0;
+      this.selections[this.activeIndex].saturation = 0;
+      this.selections[this.activeIndex].lightness = 0;
       this.selections[this.activeIndex].rotation = 0;
       this.selections[this.activeIndex].scaleWidth = 500;
       this.selections[this.activeIndex].scaleHeight = 500;
@@ -719,6 +746,7 @@ export default {
         selection.left = 0;
         selection.top = 0;
         selection.hue = 0;
+        selection.color = false;
         selection.saturation = 0;
         selection.lightness = 0;
         selection.rotation = 0;
@@ -739,7 +767,7 @@ export default {
     },
   },
   mounted(){
-    let random = this.randomNumber(0,6)
+    let random = this.randomNumber(0,0)
     //add snipped image paths to appropriate arrays in the selections array
     for(let selection in this.selections){
       let current = this.selections[selection];

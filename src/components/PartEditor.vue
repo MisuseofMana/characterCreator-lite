@@ -33,7 +33,7 @@
                 </b-button>
 
                 <b-button variant="danger" @click="$emit('reset-all')">
-                    <p class="tiny">RESET ALL OPTION</p>
+                    <p class="tiny">RESET ALL OPTIONS</p>
                     <font-awesome-icon :icon="['fas', 'retweet']" class="icon"/>
                 </b-button>
             </b-col>
@@ -173,10 +173,10 @@
                 <p class="tiny">HUE</p>
             </b-col>
             <b-col cols="7">
-                <b-form-input class="hue" debounce="500" min="0" max="360" v-model="activeHue" type="range" key="hue"></b-form-input>
+                <b-form-input class="hue" debounce="250" min="0" max="359" v-model="activeHue" type="range"></b-form-input>
             </b-col>
             <b-col cols="3">
-                <b-form-input class="hue" debounce="500" min="0" max="360" v-model="activeHue" type="number" key="hueNumber"></b-form-input>
+                <b-form-input class="hue" debounce="250" min="0" max="359" v-model="activeHue" type="number"></b-form-input>
             </b-col>
         </b-row>
         
@@ -185,10 +185,10 @@
                 <p class="tiny">SATURATION</p>
             </b-col>
             <b-col cols="5">
-                <b-form-input class="saturation" debounce="500" min="0" max="100" v-model="activeSaturation" type="range" key="saturation"></b-form-input>
+                <b-form-input class="saturation" debounce="250" min="0" max="100" v-model="activeSaturation" type="range"></b-form-input>
             </b-col>
             <b-col cols="3">
-                <b-form-input class="saturation" debounce="500" min="0" max="100" v-model="activeSaturation" type="number" key="saturationNumber"></b-form-input>
+                <b-form-input class="saturation" debounce="250" min="0" max="100" v-model="activeSaturation" type="number"></b-form-input>
             </b-col>
         </b-row>
         
@@ -197,34 +197,52 @@
                 <p class="tiny">LIGHTNESS</p>
             </b-col>
             <b-col cols="5">
-                <b-form-input class="lightness" debounce="500" min="50" max="100" v-model="activeLightness" type="range" key="lightness"></b-form-input>
+                <b-form-input class="lightness" debounce="250" min="0" max="100" v-model="activeLightness" type="range"></b-form-input>
             </b-col>
             <b-col cols="3">
-                <b-form-input class="lightness" debounce="500" min="50" max="100" v-model="activeLightness" type="number" ket="lightnessNumber"></b-form-input>
+                <b-form-input class="lightness" debounce="250" min="0" max="100" v-model="activeLightness" type="number"></b-form-input>
             </b-col>
         </b-row>
 
         <b-row class="mb-2" v-if="expandedMenu === 'color'">
             <b-col cols="12">
-                <div class="color" :style="{backgroundColor: activeColor}"></div>
+                <div class="color d-flex justify-content-center align-items-center border border-dark" :style="{backgroundColor: activeColor}">
+                    <p class="m-0 overrideShadow">
+                        CURRENT COLOR
+                    </p> 
+                </div>
             </b-col>
         </b-row>
 
-        <b-row class="mb-2" align-h="center" v-if="expandedMenu === 'color'">
-            <b-col cols="12" class="d-flex justify-content-start">
-                <b-button @click="$emit('swatch-pick', color)" class="p-4 border-0 mr-2" v-for="color in colorHistory" :key="color" :style="{backgroundColor: color}"></b-button>
+        <b-row class="mb-4" v-if="expandedMenu === 'color'">
+            <b-col 
+                cols="2"  
+                v-for="(color, index) in colorHistory" 
+                :key="color+index" 
+                @click="$emit('swatch-pick', color)"
+                :style="{
+                    backgroundColor: color,
+                    height:'40px',
+                }"
+            >
             </b-col>
         </b-row>
         
         <b-row class="mb-3" align-h="center" v-if="expandedMenu === 'color'">
-            <b-col cols="6" class="d-flex justify-content-center">
+            <b-col cols="4" class="d-flex justify-content-center">
                 <b-button variant="warning" @click="$emit('reset-color')">
                     <p class="tiny">RESET COLOR</p>
                     <font-awesome-icon class="icon" :icon="['fas', 'retweet']" />
                 </b-button>
             </b-col>
-            <b-col cols="6" class="d-flex justify-content-center">
-                <b-button @click="$emit('color-match')">
+            <b-col cols="4" class="d-flex justify-content-center">
+                <b-button variant="primary" @click="$emit('random-active-color')">
+                    <p class="tiny">RANDOM COLOR</p>
+                    <font-awesome-icon class="icon" :icon="['fas', 'palette']" />
+                </b-button>
+            </b-col>
+            <b-col cols="4" class="d-flex justify-content-center">
+                <b-button variant="primary" @click="$emit('color-match')">
                     <p class="tiny">COLOR MATCH</p>
                     <font-awesome-icon class="icon" :icon="['fas', 'palette']" />
                 </b-button>
@@ -383,6 +401,16 @@
 .color {
     height:50px;
     width:100%;
+}
+
+.overrideShadow {
+  color: white;
+  text-shadow:
+   -1px -1px 0 #000,  
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+     1px 1px 0 #000;
+    box-shadow:none;    
 }
 
 </style>

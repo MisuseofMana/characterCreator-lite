@@ -58,7 +58,7 @@
     <b-col cols="12" sm="12" md="10" class="d-flex flex-column justify-content-center ">
       <b-row class="mb-3">
           <b-col cols="12" class="d-flex justify-content-center">
-              <p class="tiny" :key="this.selections[this.activeIndex].name">Editing {{this.selections[this.activeIndex].name.replace('-', ' ').toUpperCase() }} : v.{{ this.selections[this.activeIndex].which}}</p>
+              <p class="tiny" :key="this.selections[this.activeIndex].name">Editing {{this.selections[this.activeIndex].name.replace('-', ' ').toUpperCase() }} : v.{{ this.selections[this.activeIndex].which }}</p>
           </b-col>
       </b-row>
       
@@ -74,6 +74,23 @@
           DOWNLOAD CHARACTER
         </h1> 
       </b-button>
+
+      <b-button id="downloadData" class="mb-3" @click="downloadCharacterFile()">
+        <h4 class="responsiveFont tiny">
+          SAVE CHARACTER DATA
+        </h4> 
+      </b-button>
+
+      <b-form-file
+        class="mb-3"
+        id="uploaded-file"
+        v-model="saveFile"
+        :state="Boolean(saveFile)"
+        placeholder="Choose a file or drop it here..."
+        drop-placeholder="Drop file here..."
+      >
+      </b-form-file>
+
       <p class="tiny">Characters created using this generator are bound by the Creative Commons Attribution Share-Alike license. By downloading, using, distributing, or manipulating the characters here you are agreeing to the terms <a href="https://creativecommons.org/licenses/by-sa/3.0/us/">lain out here.</a>  </p>
     </b-col>
     </b-row>
@@ -89,6 +106,8 @@ import PartMenu from '@/components/PartMenu'
 import PartEditor from '@/components/PartEditor'
 import LoadingSpinner from '@/components/LoadingSpinner'
 
+import presets from '@/assets/presets/preset.js'
+
 export default {
   components: {
     PartMenu,
@@ -97,6 +116,7 @@ export default {
   },
   data() {
     return {
+      presets,
       loading:true,
       active: 'body',
       selections: [
@@ -115,7 +135,7 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 15,
+          max: 17,
           disable: false,
           color:false,
           hue:0,
@@ -160,7 +180,7 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max:29,
+          max:32,
           disable: false,
           color:false,
           hue:0,
@@ -183,7 +203,7 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max:16,
+          max:18,
           disable: false,
           color:false,
           hue:0,
@@ -206,7 +226,7 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 21,
+          max: 23,
           disable: false,
           color:false,
           hue:0,
@@ -229,7 +249,7 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 19,
+          max: 21,
           disable: false,
           color:false,
           hue:0,
@@ -252,7 +272,7 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 16,
+          max: 18,
           disable: false,
           color:false,
           hue:0,
@@ -275,7 +295,7 @@ export default {
           rotation:0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 20,
+          max: 22,
           disable: false,
           color:false,
           hue:0,
@@ -298,7 +318,7 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 18,
+          max: 20,
           disable: false,
           color:false,
           hue:0,
@@ -320,7 +340,7 @@ export default {
           rotation: 0,
           scaleWidth:500,
           scaleHeight:500,
-          max: 11,
+          max: 13,
           disable: false,
           color:false,
           hue:0,
@@ -331,6 +351,27 @@ export default {
       imagesToLoad:0,
       expandedMenu: 'choose',
       colorList: [],
+      saveFile: null,
+    }
+  },
+  watch: {
+    saveFile: function () {
+      let parsedFile = new FileReader();
+      parsedFile.onload = (value) => {
+        const loadedFile = JSON.parse(value.currentTarget.result)
+        console.log(loadedFile)
+
+        let dupeSelection = JSON.parse(JSON.stringify(this.selections));
+        console.log(dupeSelection)
+
+        this.selections.forEach((selection, index) => {
+          this.selections[index] = {...selection, ...loadedFile[index]}
+        })
+
+        this.init()
+      }
+      let file = document.getElementById('uploaded-file').files[0]
+      parsedFile.readAsText(file)
     }
   },
   computed: {
@@ -395,6 +436,27 @@ export default {
                 }
           }
         }
+      }
+    },
+    downloadCharacterFile() {
+      let selectionParse = JSON.parse(JSON.stringify(this.selections));
+      selectionParse.forEach(item => {
+        delete item.sprites
+      })
+
+      console.log(selectionParse)
+
+      var pom = document.createElement('a');
+      pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(selectionParse)));
+      pom.setAttribute('download', 'KL-SavedCharacterData');
+
+      if (document.createEvent) {
+          var event = document.createEvent('MouseEvents');
+          event.initEvent('click', true, true);
+          pom.dispatchEvent(event);
+      }
+      else {
+          pom.click();
       }
     },
     testDraw() {
@@ -767,25 +829,25 @@ export default {
     },
   },
   mounted(){
-    let random = this.randomNumber(0,0)
+    let randomPreset = this.presets[this.randomNumber(0, this.presets.length - 1 )]
+
     //add snipped image paths to appropriate arrays in the selections array
-    for(let selection in this.selections){
-      let current = this.selections[selection];
-      current.which = random;
-      let count = current.max;
-      for (let array in current.sprites) {
-        let into = current.sprites[array];
+    this.selections.forEach((selection, index) => {
+      this.selections[index] = {...selection, ...randomPreset[index]}
+      for (let array in selection.sprites) {
+        let count = selection.max
+        let into = selection.sprites[array];
         for(let image = 1; image <= count; image++){
           if(into === null){ 
             // do nothing
           }
           else {
-            into.push(`${current.name}/${array}/${image}.png`);
+            into.push(`${selection.name}/${array}/${image}.png`);
             this.imgsToLoad++;
           }
         }
       }
-    }
+    })
     this.init();
   }
 }

@@ -3,12 +3,10 @@
     <b-container>
       <b-row class="mb-3">
         <b-col>
-          <h1 class="responsiveFont">KINGLOYAL ADVENTURER GENERATOR</h1>
-          <p class="tiny">V.0.6. Created by Sean Yager, &copy; 2021, All rights reserved.</p>
+          <CharacterCanvas />
         </b-col>
       </b-row>
 
-      <CharacterCanvas />
 
     </b-container>
   </div>

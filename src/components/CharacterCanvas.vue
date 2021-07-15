@@ -1,67 +1,9 @@
 <template>
 <b-row>
-  <b-col cols="12" xl="2" class="mb-3">
-    <b-row>
-        <PartMenu @current-open="setActive($event)" type="body" :open.sync="active"> </PartMenu>
-        <PartMenu @current-open="setActive($event)" type="eyes" :open.sync="active"> </PartMenu>
-        <PartMenu @current-open="setActive($event)" type="brows" :open.sync="active"> </PartMenu>
-        <PartMenu @current-open="setActive($event)" type="nose" :open.sync="active"> </PartMenu>
-        <PartMenu @current-open="setActive($event)" type="mouth" :open.sync="active"> </PartMenu>
-        <PartMenu @current-open="setActive($event)" type="ears" :open.sync="active"> </PartMenu>
-        <PartMenu @current-open="setActive($event)" type="hair-front" :open.sync="active"> </PartMenu>
-        <PartMenu @current-open="setActive($event)" type="hair-back" :open.sync="active"> </PartMenu>
-        <PartMenu @current-open="setActive($event)" type="clothes" :open.sync="active"> </PartMenu>
-        <PartMenu @current-open="setActive($event)" type="extras" :open.sync="active"> </PartMenu>
-    </b-row>
-  </b-col>
-
-        <PartEditor
-          @change-position="moveSprite($event)" 
-          @new-pick="pickNewItem($event)"
-          @random-item="randomItem()"
-          @disable-item="disableItem($event)"
-          @change-color="changeColor($event)"
-          @random-active-color="randomActiveColor()"
-          @rotate-clockwise="rotateClockwise($event)"
-          @rotate-anti-clockwise="rotateAntiClockwise($event)"
-          @reset-rotation="resetRotation()"
-          @scale-sprite="scaleSprite($event)"
-          @move-layer="moveLayer($event)"
-          @randomize-character="randomize()"
-          @reset-colors="reRollColors($event)"
-          @reset-color="resetColor()"
-          @reset-active="resetActive()"
-          @reset-all="resetAll()"
-          @set-open="setOpen($event)"
-          @new-hue="setHue($event)"
-          @new-saturation="setSaturation($event)"
-          @new-lightness="setLightness($event)"
-          @save-color="saveColor($event)"
-          @color-match="colorMatch($event)"
-          @swatch-pick="swatchPick($event)"
-          @re-roll-features="reRollFeatures()"
-          :hidden="selections[activeIndex].disable"
-          :type="active"
-          :activeColor="selections[activeIndex].color"
-          :hue="selections[activeIndex].hue"
-          :saturation="selections[activeIndex].saturation"
-          :lightness="selections[activeIndex].lightness"
-          :maxRange="selections[activeIndex].max" 
-          :key="`${active}editor`" 
-          :which="selections[activeIndex].which"
-          :expandedMenu="expandedMenu"
-          :colorHistory="colorList"
-        />
-
-  <b-col cols="12" xl="5" class="mb-4 d-flex flex-row justify-content-center">
+  
+  <b-col cols="5" class="mb-4 mt-2 d-flex flex-row justify-content-center">
     <b-row align-h="center">
     <b-col cols="12" sm="12" md="10" class="d-flex flex-column justify-content-center ">
-      <b-row class="mb-3">
-          <b-col cols="12" class="d-flex justify-content-center">
-              <p class="tiny" :key="this.selections[this.activeIndex].name">Editing {{this.selections[this.activeIndex].name.replace('-', ' ').toUpperCase() }} : v.{{ this.selections[this.activeIndex].which }}</p>
-          </b-col>
-      </b-row>
-      
       <b-row align-h="center" class="d-flex flex-row justify-content-center">
         <b-col cols="12" class="d-flex flex-row justify-content-center">
           <canvas id="canvas" class="mb-3" width="500" height="500"></canvas>
@@ -69,50 +11,55 @@
       </b-row>
       
       <LoadingSpinner v-show="false" key="loader"/>
-      <b-button id="download" class="mb-3" @click="downloadImage()">
-        <h1 class="responsiveFont">
-          DOWNLOAD CHARACTER
-        </h1> 
-      </b-button>
-
-      <b-button id="downloadData" class="mb-3" @click="downloadCharacterFile()">
-        <h4 class="responsiveFont tiny">
-          SAVE CHARACTER DATA
-        </h4> 
-      </b-button>
-
-      <b-form-file
-        class="mb-3"
-        id="uploaded-file"
-        v-model="saveFile"
-        :state="Boolean(saveFile)"
-        placeholder="Choose a file or drop it here..."
-        drop-placeholder="Drop file here..."
-      >
-      </b-form-file>
-
-      <p class="tiny">Characters created using this generator are bound by the Creative Commons Attribution Share-Alike license. By downloading, using, distributing, or manipulating the characters here you are agreeing to the terms <a href="https://creativecommons.org/licenses/by-sa/3.0/us/">lain out here.</a>  </p>
     </b-col>
+          <Resets/>
     </b-row>
   </b-col>
+
+   <b-col cols="7" class="d-flex flex-wrap align-items-center justify-content-center">
+    <PartEditor
+      v-for="item in selections"
+      @new-pick="pickNewItem($event)"
+      @random-item="randomItem()"
+      @change-color="changeColor($event)"
+      @random-active-color="randomActiveColor()"
+      @randomize-character="randomize()"
+      @reset-all="resetAll()"
+      @new-lightness="setLightness($event)"
+      @save-color="saveColor($event)"
+      @color-match="colorMatch($event)"
+      @swatch-pick="swatchPick($event)"
+      @re-roll-features="reRollFeatures()"
+      :hidden="selections[activeIndex].disable"
+      :type="item.name.replace('-', ' ')"
+      :activeColor="selections[activeIndex].color"
+      :lightness="selections[activeIndex].lightness"
+      :maxRange="selections[activeIndex].max" 
+      :key="item.name" 
+      :which="selections[activeIndex].which"
+      :expandedMenu="expandedMenu"
+      :colorHistory="colorList"
+      />
+  </b-col>
   
+  <!-- hidden canvas -->
   <canvas class="d-none" width="500" height="500" id="stageCanvas"></canvas>
 
 </b-row>
 </template>
 
 <script>
-import PartMenu from '@/components/PartMenu'
 import PartEditor from '@/components/PartEditor'
 import LoadingSpinner from '@/components/LoadingSpinner'
+import Resets from '@/components/Resets'
 
 import presets from '@/assets/presets/preset.js'
 
 export default {
   components: {
-    PartMenu,
     PartEditor,
-    LoadingSpinner
+    LoadingSpinner,
+    Resets
   },
   data() {
     return {
@@ -354,26 +301,6 @@ export default {
       saveFile: null,
     }
   },
-  watch: {
-    saveFile: function () {
-      let parsedFile = new FileReader();
-      parsedFile.onload = (value) => {
-        const loadedFile = JSON.parse(value.currentTarget.result)
-        console.log(loadedFile)
-
-        let dupeSelection = JSON.parse(JSON.stringify(this.selections));
-        console.log(dupeSelection)
-
-        this.selections.forEach((selection, index) => {
-          this.selections[index] = {...selection, ...loadedFile[index]}
-        })
-
-        this.init()
-      }
-      let file = document.getElementById('uploaded-file').files[0]
-      parsedFile.readAsText(file)
-    }
-  },
   computed: {
     canvas () {
       return document.getElementById('canvas');
@@ -390,9 +317,6 @@ export default {
     activeIndex () {
       const findActive = (item) => item.name === this.active;
       return this.selections.findIndex(findActive);
-    },
-    downloadButton () {
-     return document.getElementById('download');
     },
   },
   methods:{
@@ -438,52 +362,22 @@ export default {
         }
       }
     },
-    downloadCharacterFile() {
-      let selectionParse = JSON.parse(JSON.stringify(this.selections));
-      selectionParse.forEach(item => {
-        delete item.sprites
-      })
-
-      console.log(selectionParse)
-
-      var pom = document.createElement('a');
-      pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(selectionParse)));
-      pom.setAttribute('download', 'KL-SavedCharacterData');
-
-      if (document.createEvent) {
-          var event = document.createEvent('MouseEvents');
-          event.initEvent('click', true, true);
-          pom.dispatchEvent(event);
-      }
-      else {
-          pom.click();
-      }
-    },
     testDraw() {
       this.stagectx.clearRect(0,0,500,500)
       let current = this.selections[4]
 
       this.stagectx.globalCompositeOperation = "source-over";
-      this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+      this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, 0, 0, 500, 500);
 
       this.stagectx.globalCompositeOperation = 'lighter';
-      // this.stagectx.globalCompositeOperation = 'lighter';
-      this.stagectx.fillStyle = 'hsl(200, 100%, 50%)';
+      this.stagectx.fillStyle = 'hsl(0, 0%, 50%)';
       this.stagectx.fillRect(0, 0, 500, 500);
 
-      // this.stagectx.globalCompositeOperation = "saturation";
-      // this.stagectx.fillStyle = `hsl(0, 100%, 50%)`;
-      // this.stagectx.fillRect(0, 0, 500, 500);
-
-      // this.stagectx.globalCompositeOperation = "hue";
-      // this.stagectx.fillStyle = `hsl(200, 1%, 50%)`;
-      // this.stagectx.fillRect(0, 0, 500, 500);
-
       this.stagectx.globalCompositeOperation = "destination-in";
-      this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+      this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, 0, 0, 500, 500);
 
       this.stagectx.globalCompositeOperation = "source-over";
-      this.stagectx.drawImage(current.sprites.lineImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+      this.stagectx.drawImage(current.sprites.lineImg, 0, 0, 500, 500, 0, 0, 500, 500);
     },
     drawImages(){
       this.ctx.clearRect(0,0,500,500) //clear the display canvas
@@ -505,25 +399,25 @@ export default {
             if(current.sprites.flatImg && current.color === true){
 
               this.stagectx.globalCompositeOperation = "source-over";
-              this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+              this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, 0, 0, 500, 500);
 
               let mode = current.lightness <= 50 ? 'darken' : 'lighten' 
               this.stagectx.globalCompositeOperation = mode;
-              this.stagectx.fillStyle = `hsl(${current.hue}, ${current.saturation}%, ${current.lightness}%)`;
+              this.stagectx.fillStyle = `hsl(0, 0%, ${current.lightness}%)`;
               this.stagectx.fillRect(0, 0, 500, 500);
               
               this.stagectx.globalCompositeOperation = "destination-in";
-              this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+              this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, 0, 0, 500, 500);
             }
 
             else if(current.sprites.flatImg && current.color !== true){
               this.stagectx.globalCompositeOperation = "source-over";
-              this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+              this.stagectx.drawImage(current.sprites.flatImg, 0, 0, 500, 500, 0, 0, 500, 500);
             }
     
             if(current.sprites.lineImg) {
               this.stagectx.globalCompositeOperation = "source-over";
-              this.stagectx.drawImage(current.sprites.lineImg, 0, 0, 500, 500, current.top, current.left, current.scaleWidth, current.scaleHeight);
+              this.stagectx.drawImage(current.sprites.lineImg, 0, 0, 500, 500, 0, 0, 500, 500);
             }
     
             this.stagectx.restore();
@@ -533,105 +427,9 @@ export default {
       } //End for loop
       // this.stagectx.clearRect(0,0,500,500)
     },
-    moveSprite(e) {
-      if(e.direction === 'y'){
-        this.selections[this.activeIndex].left += e.value;
-      }
-
-      if(e.direction === 'x') {
-        this.selections[this.activeIndex].top += e.value;
-      }
-
-      if(e.direction === 'xy-neg') {
-        this.selections[this.activeIndex].left += e.value;
-        this.selections[this.activeIndex].top += e.value
-      }
-
-      if(e.direction === 'xy-pos') {
-        this.selections[this.activeIndex].left += e.value;
-        this.selections[this.activeIndex].top -= e.value
-      }
-        this.init();
-    },
-    scaleSprite(e) {
-      if(e === 'tall' || e === 'up') {
-        this.selections[this.activeIndex].scaleHeight += 10;
-        this.selections[this.activeIndex].top -= 5;
-      }
-      if(e === 'short' || e === 'down') {
-        this.selections[this.activeIndex].scaleHeight -= 10;
-        this.selections[this.activeIndex].top += 5;
-      }
-      if(e === 'wide' || e === 'up') {
-        this.selections[this.activeIndex].scaleWidth += 10;
-        this.selections[this.activeIndex].left -= 5;
-      }
-      if(e === 'thin' || e === 'down') {
-        this.selections[this.activeIndex].scaleWidth -= 10;
-        this.selections[this.activeIndex].left += 5;
-      }
-      if(e === 'reset') {
-        this.selections[this.activeIndex].scaleWidth = 500;
-        this.selections[this.activeIndex].scaleHeight = 500;
-        this.selections[this.activeIndex].left = 0;
-        this.selections[this.activeIndex].top = 0;
-      }
-      this.init();
-    },
     pickNewItem(e) {
       this.selections[this.activeIndex].which = e;
       this.selections[this.activeIndex].disable = false;
-      this.init();
-    },
-    rotateClockwise(e) {
-      this.selections[this.activeIndex].rotation += e
-      if(this.selections[this.activeIndex].rotation >= 24) {
-        this.selections[this.activeIndex].rotation = 0;
-      }
-      this.init()
-    },
-    rotateAntiClockwise(e) {
-      this.selections[this.activeIndex].rotation -= e
-      if(this.selections[this.activeIndex].rotation <= -24) {
-        this.selections[this.activeIndex].rotation = 0;
-      }
-      this.init()
-    },
-    disableItem(e) {
-      if(e === 'disable') {
-        this.selections[this.activeIndex].disable = true;
-        this.init();
-      }
-
-      if(e === 'enable') {
-        this.selections[this.activeIndex].disable = false;
-        this.init();
-      }
-    },
-    moveLayer(e) {
-      let indexFrom = this.activeIndex;
-      let forwardIndex = indexFrom++;
-      let backwardIndex = indexFrom--;
-
-      if(forwardIndex > this.selections.length - 1) {
-        forwardIndex = 0;
-      }
-
-      if(backwardIndex < 0) {
-        backwardIndex = this.selections.length - 1;
-      }
-
-      let movingItem = this.selections[indexFrom]
-      if(e === 'up') {
-        this.selections[indexFrom] = this.selections[forwardIndex];
-        this.selections[forwardIndex] = movingItem;
-      }
-
-      if(e === 'down') {
-        this.selections[indexFrom] = this.selections[backwardIndex];
-        this.selections[backwardIndex] = movingItem;
-      }
-
       this.init();
     },
     randomItem(){
@@ -678,12 +476,6 @@ export default {
     },
     randomize() {
       for(let selection of this.selections){
-        // let randomProperty = () => {
-        //     let keys = Object.keys(this.colorList);
-        //     return this.colorList[keys[ keys.length * Math.random() << 0]];
-        // };
-        // let getRandomColor = randomProperty();
-  
         selection.color = true
         selection.hue = this.randomNumber(0, 359)
         selection.saturation = this.randomNumber(0,100)
@@ -709,18 +501,6 @@ export default {
       let parsedHSL = e.slice(4, -1).replaceAll(',', '').replaceAll('%', '');
       let hslArray = parsedHSL.split(' ')
       this.assignHSL(hslArray, this.selections[this.activeIndex])
-      this.init()
-    },
-    setHue(e){
-      this.selections[this.activeIndex].color = true
-      this.selections[this.activeIndex].hue = e
-      this.addNewColor()
-      this.init()
-    },
-    setSaturation(e){
-      this.selections[this.activeIndex].color = true
-      this.selections[this.activeIndex].saturation = e
-      this.addNewColor()
       this.init()
     },
     setLightness(e){
@@ -794,8 +574,6 @@ export default {
       this.selections[this.activeIndex].left = 0;
       this.selections[this.activeIndex].top = 0;
       this.selections[this.activeIndex].color = false;
-      this.selections[this.activeIndex].hue = 0;
-      this.selections[this.activeIndex].saturation = 0;
       this.selections[this.activeIndex].lightness = 0;
       this.selections[this.activeIndex].rotation = 0;
       this.selections[this.activeIndex].scaleWidth = 500;
@@ -807,9 +585,6 @@ export default {
       for(let selection of this.selections){
         selection.left = 0;
         selection.top = 0;
-        selection.hue = 0;
-        selection.color = false;
-        selection.saturation = 0;
         selection.lightness = 0;
         selection.rotation = 0;
         selection.scaleWidth = 500;
@@ -817,15 +592,6 @@ export default {
         selection.disable = false;
       }
       this.init();
-    },
-    downloadImage(){
-    let downloadLink = document.createElement('a');
-    downloadLink.setAttribute('download', 'YourAdventurer.png');
-    this.canvas.toBlob(function(blob) {
-      let url = URL.createObjectURL(blob);
-      downloadLink.setAttribute('href', url);
-      downloadLink.click();
-    });
     },
   },
   mounted(){
